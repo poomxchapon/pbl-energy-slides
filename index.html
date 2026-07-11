@@ -86,6 +86,11 @@
   .img-slot .prompt { font-size: clamp(12px, 1.3vw, 15px); color: var(--muted); max-width: 40ch; }
   .img-slot img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
   .img-slot.filled { padding: 0; border: 1px solid var(--line); overflow: hidden; }
+  .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+  .photo-grid img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; min-height: 0; }
+  .chart-box { display: flex; flex-direction: column; gap: 6px; }
+  .chart-box img { border-radius: 8px; background: #fff; }
+  .chart-box .src { font-size: 11px; color: var(--muted); text-align: center; padding-bottom: 6px; }
 
   /* ---------- stats ---------- */
   .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(12px, 2vw, 28px); margin: clamp(14px, 3vh, 30px) 0; }
@@ -258,13 +263,15 @@
       <div class="stat"><div class="num">___ จุด/วัน</div><div class="lab">จุดเปิดทิ้งที่นับได้จริงจากการเดินสำรวจ Innovative Village (รอข้อมูล)</div></div>
     </div>
     <div class="cols">
-      <div class="img-slot" style="min-height:clamp(110px,22vh,220px)">
-        <div class="tag">📷 PHOTO SLOT #2</div>
-        <div class="prompt">รูปถ่ายจริง: ห้อง/โซนว่างที่ไฟและแอร์ยังเปิด ช่วงพักเที่ยง (ถ่ายเอง ห้าม gen — เป็นหลักฐานวิจัย)</div>
+      <div class="img-slot filled photo-grid" style="min-height:clamp(110px,26vh,260px)">
+        <img src="assets/audit1.webp" alt="ห้องทำงานเปิดไฟและแอร์ทิ้งไว้ทั้งที่ไม่มีคน">
+        <img src="assets/audit2.webp" alt="แอร์และพัดลมเพดานทำงานในห้องว่าง">
+        <img src="assets/audit3.webp" alt="ไฟเพดานและพัดลมเปิดทิ้งไว้">
+        <img src="assets/audit4.webp" alt="หลอดไฟเปิดทิ้งไว้ตอนกลางวันที่แสงธรรมชาติเพียงพอ">
       </div>
-      <div class="img-slot" style="min-height:clamp(110px,22vh,220px)">
-        <div class="tag">📊 CHART SLOT #3 — กราฟอ้างอิงจากการค้นคว้าของหยก</div>
-        <div class="prompt">กราฟข้อมูลอ้างอิง (Reference) ที่หยกหาไว้ — รอไฟล์กราฟ ส่งมาแล้วแปะช่องนี้ได้เลย · อย่าลืมใส่ที่มา (source) ใต้กราฟด้วย</div>
+      <div class="img-slot filled chart-box" style="min-height:clamp(110px,26vh,260px)">
+        <img src="assets/iea_chart.webp" alt="กราฟ IEA: Total energy demand in the residential sector by end-use, 2023">
+        <div class="src">ที่มา: IEA — Total energy demand in the residential sector, by end-use (2023), Licence: CC BY 4.0</div>
       </div>
     </div>
   </section>
@@ -404,7 +411,7 @@
 <button class="navbtn" id="next" aria-label="สไลด์ถัดไป">›</button>
 <div id="counter">1 / 11</div>
 <div id="hint">← → เปลี่ยนสไลด์ · N = โน้ตผู้พูด · F = เต็มจอ</div>
-<div id="ver">PBL-SLIDES v0.1.3</div>
+<div id="ver">PBL-SLIDES v0.1.4</div>
 <div id="notes"><span class="n-tag">SPEAKER NOTES</span><p id="note-text"></p></div>
 
 <script>
