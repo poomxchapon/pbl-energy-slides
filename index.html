@@ -88,6 +88,26 @@
   .img-slot.filled { padding: 0; border: 1px solid var(--line); overflow: hidden; }
   .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
   .photo-grid img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; min-height: 0; }
+  .evidence-grid { display: grid; grid-template-columns: .8fr 1.2fr; gap: clamp(14px, 2vw, 28px); align-items: stretch; min-height: 0; }
+  .evidence-grid figure { margin: 0; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); position: relative; box-shadow: var(--shadow); }
+  .evidence-grid figure img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .evidence-grid figcaption {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(transparent, rgba(5, 7, 2, .92));
+    padding: 34px 16px 12px; font-size: clamp(11px, 1.25vw, 15px); line-height: 1.5;
+  }
+  .ev-right { display: flex; flex-direction: column; gap: clamp(8px, 1.5vh, 16px); min-height: 0; }
+  .stat-compact {
+    display: flex; align-items: center; gap: 16px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: clamp(8px, 1.4vh, 14px) clamp(12px, 1.6vw, 22px);
+  }
+  .stat-compact .num {
+    font-family: "JetBrains Mono", monospace; font-variant-numeric: tabular-nums;
+    font-size: clamp(20px, 2.6vw, 34px); font-weight: 700; color: var(--amber);
+    min-width: clamp(90px, 10vw, 140px); white-space: nowrap;
+  }
+  .stat-compact .lab { font-size: clamp(11px, 1.25vw, 15px); color: var(--muted); line-height: 1.45; }
   .chart-box { display: flex; flex-direction: column; gap: 6px; }
   .chart-box img { border-radius: 8px; background: #fff; }
   .chart-box .src { font-size: 11px; color: var(--muted); text-align: center; padding-bottom: 6px; }
@@ -197,6 +217,8 @@
     .stat .num { font-size: 34px; }
     .mechs { grid-template-columns: 1fr; }
     .timeline { flex-direction: column; }
+    .evidence-grid { grid-template-columns: 1fr; }
+    .evidence-grid figure { max-height: 40vh; }
     .slide { justify-content: flex-start; overflow-y: auto; padding-top: 48px; padding-bottom: 80px; }
     .navbtn { display: none; }
   }
@@ -257,21 +279,19 @@
   <section class="slide" data-note="'เราเดินสำรวจจริง 3 วัน พบจุดเปิดทิ้งเฉลี่ย ___ จุด/วัน คิดเป็นเงินปีละหลักหมื่นบาทที่หายไปโดยไม่มีใครได้ประโยชน์ ทุกหน่วยไฟที่เสียเปล่า = CO2 ~0.4-0.5 กก.' อัตราค่าไฟ 3.95 บาท/หน่วย (กกพ./PEA งวด พ.ค.-ส.ค.69) — 1:30 นาที สไลด์นี้คือจุดขาย">
     <div class="kicker">Slide 4 · Evidence / Impact</div>
     <h2>ตัวเลขจากออฟฟิศจริง <span class="accent">+ โลกจริง</span></h2>
-    <div class="stat-row">
-      <div class="stat"><div class="num" data-count="30" data-suffix="%">0%</div><div class="lab">ของพลังงานอาคารสำนักงานถูกใช้อย่างสูญเปล่า (สถิติสากล)</div></div>
-      <div class="stat"><div class="num" data-count="110" data-suffix=" ฿">0 ฿</div><div class="lab">ต่อเดือน ต่อแอร์ 1 เครื่อง ที่เปิดทิ้งแค่ชั่วพักเที่ยง (≈1,300 ฿/ปี)</div></div>
-      <div class="stat"><div class="num">___ จุด/วัน</div><div class="lab">จุดเปิดทิ้งที่นับได้จริงจากการเดินสำรวจ Innovative Village (รอข้อมูล)</div></div>
-    </div>
-    <div class="cols">
-      <div class="img-slot filled photo-grid" style="min-height:clamp(110px,26vh,260px)">
-        <img src="assets/audit1.webp" alt="ห้องทำงานเปิดไฟและแอร์ทิ้งไว้ทั้งที่ไม่มีคน">
-        <img src="assets/audit2.webp" alt="แอร์และพัดลมเพดานทำงานในห้องว่าง">
-        <img src="assets/audit3.webp" alt="ไฟเพดานและพัดลมเปิดทิ้งไว้">
-        <img src="assets/audit4.webp" alt="หลอดไฟเปิดทิ้งไว้ตอนกลางวันที่แสงธรรมชาติเพียงพอ">
-      </div>
-      <div class="img-slot filled chart-box" style="min-height:clamp(110px,26vh,260px)">
-        <img src="assets/iea_chart.webp" alt="กราฟ IEA: Total energy demand in the residential sector by end-use, 2023">
-        <div class="src">ที่มา: IEA — Total energy demand in the residential sector, by end-use (2023), Licence: CC BY 4.0</div>
+    <div class="evidence-grid">
+      <figure>
+        <img src="assets/audit1.webp" alt="ห้องทำงานใน Innovative Village เปิดไฟ แอร์ และพัดลมพร้อมกันขณะแทบไม่มีคน">
+        <figcaption>📷 ถ่ายจริงจากสำนักงานใน Innovative Village — ไฟเพดานทุกดวง แอร์ และพัดลม ทำงานพร้อมกันขณะไม่มีคนอยู่ในห้อง</figcaption>
+      </figure>
+      <div class="ev-right">
+        <div class="stat-compact"><div class="num" data-count="30" data-suffix="%">0%</div><div class="lab">ของพลังงานในอาคารสำนักงานถูกใช้อย่างสูญเปล่า (สถิติสากล)</div></div>
+        <div class="stat-compact"><div class="num" data-count="110" data-suffix=" ฿">0 ฿</div><div class="lab">ต่อเดือน ต่อแอร์ 1 เครื่อง ที่เปิดทิ้งแค่ชั่วพักเที่ยง (≈1,300 ฿/ปี/เครื่อง)</div></div>
+        <div class="stat-compact"><div class="num">CO₂ 0.5kg</div><div class="lab">ต่อไฟฟ้าทุก 1 หน่วยที่เสียเปล่า (grid factor ไทย ~0.4–0.5 kgCO₂/kWh)</div></div>
+        <div class="img-slot filled chart-box" style="flex:1; min-height:clamp(100px,20vh,220px)">
+          <img src="assets/iea_chart.webp" alt="กราฟ IEA: Total energy demand in the residential sector by end-use, 2023" style="object-fit:contain; min-height:0; flex:1;">
+          <div class="src">ที่มา: IEA — Total energy demand in the residential sector, by end-use (2023), Licence: CC BY 4.0</div>
+        </div>
       </div>
     </div>
   </section>
@@ -411,7 +431,7 @@
 <button class="navbtn" id="next" aria-label="สไลด์ถัดไป">›</button>
 <div id="counter">1 / 11</div>
 <div id="hint">← → เปลี่ยนสไลด์ · N = โน้ตผู้พูด · F = เต็มจอ</div>
-<div id="ver">PBL-SLIDES v0.1.4</div>
+<div id="ver">PBL-SLIDES v0.1.5</div>
 <div id="notes"><span class="n-tag">SPEAKER NOTES</span><p id="note-text"></p></div>
 
 <script>
