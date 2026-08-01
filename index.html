@@ -3,20 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ประหยัดไฟให้เป็นเกม — PBL Presentation</title>
+<title>ตรวจก่อนออก — Office Energy Saving | PBL</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #101408;
-    --bg2: #161b0d;
     --surface: rgba(255, 255, 255, 0.04);
+    --surface2: rgba(255, 255, 255, 0.07);
     --line: rgba(255, 214, 90, 0.18);
     --ink: #F2F0E4;
     --muted: #9BA088;
     --amber: #FFC63A;
-    --amber-deep: #E8A200;
     --green: #58D6A4;
     --red: #FF7A5C;
     --shadow: 0 20px 60px rgba(0,0,0,.5);
@@ -25,207 +24,147 @@
   html, body { height: 100%; overflow: hidden; background: var(--bg); }
   body {
     font-family: "Noto Sans Thai", "Leelawadee UI", "Sarabun", sans-serif;
-    color: var(--ink);
-    line-height: 1.6;
+    color: var(--ink); line-height: 1.6;
   }
-  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
 
-  #bg-canvas { position: fixed; inset: 0; z-index: 0; opacity: .55; }
-
-  /* ---------- deck ---------- */
+  #bg-canvas { position: fixed; inset: 0; z-index: 0; opacity: .5; }
   #deck { position: relative; width: 100%; height: 100%; z-index: 1; }
   .slide {
-    position: absolute; inset: 0;
-    display: none;
-    flex-direction: column;
-    justify-content: center;
-    padding: clamp(24px, 5vh, 64px) clamp(24px, 7vw, 110px);
-    opacity: 0;
-    transform: translateY(14px);
+    position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center;
+    padding: clamp(20px, 4.5vh, 56px) clamp(22px, 6.5vw, 100px);
+    opacity: 0; transform: translateY(14px);
   }
-  .slide.active { display: flex; opacity: 1; transform: none; transition: opacity .45s ease, transform .45s ease; }
+  .slide.active { display: flex; opacity: 1; transform: none; transition: opacity .4s ease, transform .4s ease; }
 
   .kicker {
     display: inline-flex; align-items: center; gap: 10px;
-    font-size: clamp(11px, 1.3vw, 14px);
-    letter-spacing: .22em; text-transform: uppercase;
-    color: var(--amber); font-weight: 800;
-    margin-bottom: clamp(8px, 1.6vh, 18px);
+    font-size: clamp(10px, 1.2vw, 13px); letter-spacing: .2em; text-transform: uppercase;
+    color: var(--amber); font-weight: 800; margin-bottom: clamp(6px, 1.2vh, 14px);
   }
-  .kicker::before { content: "⚡"; }
-  h1 { font-size: clamp(30px, 5.6vw, 72px); font-weight: 800; line-height: 1.18; letter-spacing: -0.01em; }
-  h2 { font-size: clamp(24px, 3.6vw, 46px); font-weight: 800; line-height: 1.25; margin-bottom: clamp(12px, 2.4vh, 26px); }
+  .kicker::before { content: "◧"; }
+  h1 { font-size: clamp(30px, 5.4vw, 68px); font-weight: 800; line-height: 1.15; letter-spacing: -0.01em; }
+  h2 { font-size: clamp(21px, 3.2vw, 40px); font-weight: 800; line-height: 1.25; margin-bottom: clamp(10px, 2vh, 22px); text-wrap: balance; }
   .accent { color: var(--amber); }
   .green { color: var(--green); }
-  .lead { font-size: clamp(15px, 1.7vw, 22px); color: var(--muted); max-width: 62ch; }
+  .red { color: var(--red); }
+  .lead { font-size: clamp(14px, 1.6vw, 21px); color: var(--muted); max-width: 62ch; }
 
-  ul.points { list-style: none; margin-top: clamp(10px, 2vh, 20px); }
+  ul.points { list-style: none; }
   ul.points li {
-    position: relative; padding-left: 34px;
-    font-size: clamp(15px, 1.8vw, 23px);
-    margin: clamp(6px, 1.4vh, 14px) 0;
+    position: relative; padding-left: 28px; font-size: clamp(13px, 1.55vw, 20px);
+    margin: clamp(5px, 1.1vh, 12px) 0;
   }
-  ul.points li::before {
-    content: "▸"; position: absolute; left: 6px; color: var(--amber); font-weight: 800;
-  }
+  ul.points li::before { content: "▸"; position: absolute; left: 4px; color: var(--amber); font-weight: 800; }
   ul.points li strong { color: var(--amber); font-weight: 800; }
   ul.points li em { color: var(--green); font-style: normal; font-weight: 600; }
+  ul.points.sm li { font-size: clamp(12px, 1.35vw, 17px); }
 
-  .cols { display: grid; grid-template-columns: 1.15fr .85fr; gap: clamp(20px, 3vw, 48px); align-items: center; }
+  .cols { display: grid; grid-template-columns: 1.1fr .9fr; gap: clamp(16px, 2.6vw, 40px); align-items: center; min-height: 0; }
+  .cols.even { grid-template-columns: 1fr 1fr; }
 
-  /* ---------- image slot (ทีม gen รูปมาแทนที่) ---------- */
-  .img-slot {
-    border: 2px dashed rgba(255, 198, 58, 0.4);
-    border-radius: 14px;
-    background: rgba(255, 198, 58, 0.05);
-    min-height: clamp(140px, 30vh, 320px);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    text-align: center; padding: 18px; gap: 8px;
-  }
-  .img-slot .tag { font-size: 12px; letter-spacing: .18em; color: var(--amber); font-weight: 800; }
-  .img-slot .prompt { font-size: clamp(12px, 1.3vw, 15px); color: var(--muted); max-width: 40ch; }
-  .img-slot img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
-  .img-slot.filled { padding: 0; border: 1px solid var(--line); overflow: hidden; }
-  .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
-  .photo-grid img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; min-height: 0; }
-  .evidence-grid { display: grid; grid-template-columns: .8fr 1.2fr; gap: clamp(14px, 2vw, 28px); align-items: stretch; min-height: 0; }
-  .evidence-grid figure { margin: 0; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); position: relative; box-shadow: var(--shadow); }
-  .evidence-grid figure img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .evidence-grid figcaption {
+  figure { margin: 0; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); position: relative; box-shadow: var(--shadow); }
+  figure img { width: 100%; height: 100%; object-fit: cover; display: block; max-height: 56vh; }
+  figcaption {
     position: absolute; left: 0; right: 0; bottom: 0;
-    background: linear-gradient(transparent, rgba(5, 7, 2, .92));
-    padding: 34px 16px 12px; font-size: clamp(11px, 1.25vw, 15px); line-height: 1.5;
+    background: linear-gradient(transparent, rgba(5,7,2,.94));
+    padding: 32px 14px 11px; font-size: clamp(10px, 1.15vw, 14px); line-height: 1.5;
   }
-  .ev-right { display: flex; flex-direction: column; gap: clamp(8px, 1.5vh, 16px); min-height: 0; }
-  .stat-compact {
-    display: flex; align-items: center; gap: 16px;
-    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
-    padding: clamp(8px, 1.4vh, 14px) clamp(12px, 1.6vw, 22px);
-  }
-  .stat-compact .num {
-    font-family: "JetBrains Mono", monospace; font-variant-numeric: tabular-nums;
-    font-size: clamp(20px, 2.6vw, 34px); font-weight: 700; color: var(--amber);
-    min-width: clamp(90px, 10vw, 140px); white-space: nowrap;
-  }
-  .stat-compact .lab { font-size: clamp(11px, 1.25vw, 15px); color: var(--muted); line-height: 1.45; }
-  .chart-box { display: flex; flex-direction: column; gap: 6px; }
-  .chart-box img { border-radius: 8px; background: #fff; }
-  .chart-box .src { font-size: 11px; color: var(--muted); text-align: center; padding-bottom: 6px; }
 
-  /* ---------- stats ---------- */
-  .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(12px, 2vw, 28px); margin: clamp(14px, 3vh, 30px) 0; }
-  .stat {
-    background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
-    padding: clamp(14px, 2.4vh, 28px) clamp(14px, 1.8vw, 26px);
-    box-shadow: var(--shadow);
+  /* stats */
+  .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(10px, 1.8vw, 24px); margin: clamp(10px, 2vh, 22px) 0; }
+  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: clamp(12px, 2vh, 22px) clamp(12px, 1.6vw, 22px); box-shadow: var(--shadow); }
+  .stat .num { font-family: "JetBrains Mono", monospace; font-variant-numeric: tabular-nums; font-size: clamp(26px, 4vw, 54px); font-weight: 700; color: var(--amber); line-height: 1.05; }
+  .stat .lab { font-size: clamp(11px, 1.2vw, 15px); color: var(--muted); margin-top: 6px; }
+  .stat-compact { display: flex; align-items: center; gap: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: clamp(7px, 1.3vh, 13px) clamp(11px, 1.5vw, 20px); }
+  .stat-compact .num { font-family: "JetBrains Mono", monospace; font-variant-numeric: tabular-nums; font-size: clamp(17px, 2.3vw, 30px); font-weight: 700; color: var(--amber); min-width: clamp(78px, 9vw, 126px); white-space: nowrap; }
+  .stat-compact .lab { font-size: clamp(10px, 1.15vw, 14px); color: var(--muted); line-height: 1.45; }
+
+  /* cause cards */
+  .cards3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(10px, 1.8vw, 22px); margin-top: clamp(8px, 1.6vh, 18px); }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: clamp(12px, 2vh, 22px); box-shadow: var(--shadow); }
+  .card .ic { font-size: clamp(20px, 2.6vw, 34px); }
+  .card b { display: block; font-size: clamp(13px, 1.6vw, 20px); margin: 6px 0 4px; color: var(--amber); }
+  .card p { font-size: clamp(11px, 1.25vw, 15px); color: var(--muted); }
+  .card .tagline { font-size: clamp(10px, 1.1vw, 13px); color: var(--green); margin-top: 8px; font-weight: 600; }
+
+  /* gap: before/after */
+  .gap-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: clamp(10px, 2vw, 26px); align-items: center; margin-top: clamp(6px, 1.4vh, 16px); }
+  .gap-box { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: clamp(12px, 2vh, 22px); }
+  .gap-box.know { border-color: rgba(88,214,164,.4); }
+  .gap-box.miss { border-color: rgba(255,122,92,.45); }
+  .gap-box h4 { font-size: clamp(13px, 1.55vw, 19px); margin-bottom: 8px; }
+  .gap-box ul { list-style: none; }
+  .gap-box li { font-size: clamp(11px, 1.25vw, 15px); color: var(--muted); margin: 5px 0; padding-left: 20px; position: relative; }
+  .gap-box.know li::before { content: "✓"; position: absolute; left: 0; color: var(--green); }
+  .gap-box.miss li::before { content: "✕"; position: absolute; left: 0; color: var(--red); }
+  .gap-arrow { font-size: clamp(20px, 3vw, 40px); color: var(--amber); }
+
+  /* flow */
+  .flow { display: flex; align-items: stretch; gap: 6px; margin-top: clamp(8px, 1.8vh, 20px); flex-wrap: wrap; }
+  .flow .step {
+    flex: 1 1 0; min-width: 110px; background: var(--surface); border: 1px solid var(--line);
+    border-top: 3px solid var(--amber); border-radius: 10px; padding: clamp(9px, 1.6vh, 16px) clamp(8px, 1vw, 14px);
   }
-  .stat .num { font-family: "JetBrains Mono", monospace; font-size: clamp(30px, 4.6vw, 62px); font-weight: 700; color: var(--amber); line-height: 1.05; }
-  .stat .lab { font-size: clamp(12px, 1.3vw, 16px); color: var(--muted); margin-top: 8px; }
+  .flow .step b { display: block; font-size: clamp(11px, 1.3vw, 16px); }
+  .flow .step span { font-size: clamp(10px, 1.05vw, 13px); color: var(--muted); }
+  .flow .step:nth-child(5) { border-top-color: var(--green); }
 
-  /* ---------- why chain ---------- */
-  .chain { display: flex; flex-direction: column; gap: clamp(4px, 1vh, 10px); max-width: 900px; }
-  .chain .q {
-    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
-    padding: clamp(8px, 1.4vh, 14px) clamp(14px, 2vw, 24px);
-    font-size: clamp(13px, 1.6vw, 20px);
-  }
-  .chain .q b { color: var(--amber); margin-right: 8px; }
-  .chain .arrow { text-align: center; color: var(--amber); font-size: clamp(14px, 1.8vh, 22px); line-height: 1; }
-  .chain .root {
-    background: linear-gradient(135deg, rgba(255,122,92,.14), rgba(255,198,58,.10));
-    border: 2px solid var(--red); border-radius: 14px;
-    padding: clamp(12px, 2vh, 20px) clamp(16px, 2.4vw, 28px);
-    font-size: clamp(15px, 2vw, 24px); font-weight: 800;
-  }
-  .chain .root .sub { display: block; font-size: clamp(12px, 1.4vw, 17px); font-weight: 400; color: var(--muted); margin-top: 4px; }
+  /* tables */
+  .tbl-wrap { overflow-x: auto; margin-top: clamp(8px, 1.6vh, 18px); }
+  table.vars { border-collapse: collapse; width: 100%; }
+  table.vars td, table.vars th { border: 1px solid var(--line); padding: clamp(5px, 1vh, 11px) clamp(9px, 1.3vw, 18px); font-size: clamp(11px, 1.3vw, 16px); text-align: left; }
+  table.vars th { color: var(--amber); font-weight: 800; background: var(--surface); font-size: clamp(10px, 1.2vw, 15px); }
+  table.vars td:first-child { color: var(--amber); font-weight: 700; }
+  table.vars td.num { font-family: "JetBrains Mono", monospace; font-variant-numeric: tabular-nums; color: var(--ink); }
+  table.vars tr.win td { background: rgba(88,214,164,.10); }
+  table.vars tr.win td:first-child { color: var(--green); }
+  table.vars tr.lose td:first-child { color: var(--red); }
 
-  /* ---------- hypothesis card ---------- */
-  .hypo {
-    background: var(--surface); border: 1px solid var(--amber); border-radius: 18px;
-    padding: clamp(16px, 3vh, 32px) clamp(18px, 2.6vw, 36px);
-    box-shadow: var(--shadow); margin-bottom: clamp(10px, 2vh, 20px);
-  }
-  .hypo .h-tag { font-size: 13px; letter-spacing: .2em; color: var(--amber); font-weight: 800; margin-bottom: 6px; }
-  .hypo p { font-size: clamp(16px, 2.1vw, 26px); font-weight: 600; line-height: 1.5; }
-  .hypo.secondary { border-color: var(--line); }
-  .hypo.secondary p { font-weight: 400; font-size: clamp(14px, 1.7vw, 21px); color: var(--muted); }
+  .callout { border-left: 4px solid var(--green); background: rgba(88,214,164,.09); border-radius: 0 10px 10px 0; padding: clamp(9px, 1.6vh, 16px) clamp(12px, 1.6vw, 22px); margin-top: clamp(8px, 1.6vh, 18px); font-size: clamp(12px, 1.4vw, 18px); }
+  .callout.warn { border-left-color: var(--amber); background: rgba(255,198,58,.09); }
 
-  table.vars { border-collapse: collapse; width: 100%; max-width: 880px; margin-top: 8px; }
-  table.vars td {
-    border: 1px solid var(--line); padding: clamp(6px, 1.2vh, 12px) clamp(12px, 1.6vw, 20px);
-    font-size: clamp(12px, 1.5vw, 18px);
-  }
-  table.vars td:first-child { color: var(--amber); font-weight: 700; white-space: nowrap; width: 1%; }
+  .refs { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(8px, 1.4vw, 18px); margin-top: clamp(6px, 1.2vh, 14px); }
+  .ref { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: clamp(10px, 1.7vh, 18px) clamp(11px, 1.4vw, 20px); }
+  .ref b { display: block; font-size: clamp(12px, 1.4vw, 17px); color: var(--amber); margin-bottom: 4px; }
+  .ref p { font-size: clamp(10.5px, 1.2vw, 14.5px); color: var(--muted); }
+  .ref .cite { font-size: clamp(9.5px, 1.05vw, 12.5px); color: rgba(155,160,136,.75); margin-top: 6px; font-style: italic; }
 
-  /* ---------- timeline ---------- */
-  .timeline { display: flex; gap: 8px; margin-top: clamp(12px, 2.4vh, 24px); max-width: 900px; }
-  .phase { flex: 1; border-radius: 12px; padding: clamp(10px, 1.8vh, 18px) 14px; border: 1px solid var(--line); background: var(--surface); }
-  .phase b { display: block; font-size: clamp(13px, 1.6vw, 19px); }
-  .phase span { font-size: clamp(11px, 1.2vw, 14px); color: var(--muted); }
-  .phase.p1 { border-top: 4px solid var(--muted); }
-  .phase.p2 { border-top: 4px solid var(--amber); }
-  .phase.p3 { border-top: 4px solid var(--green); }
+  .kpi-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(10px, 1.8vw, 22px); margin-top: clamp(8px, 1.6vh, 18px); }
+  .kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: clamp(11px, 1.9vh, 20px); }
+  .kpi h4 { font-size: clamp(12px, 1.45vw, 18px); color: var(--amber); margin-bottom: 8px; }
+  .kpi li { list-style: none; font-size: clamp(10.5px, 1.2vw, 14.5px); color: var(--muted); margin: 5px 0; padding-left: 16px; position: relative; }
+  .kpi li::before { content: "•"; position: absolute; left: 2px; color: var(--amber); }
 
-  /* ---------- mechanics ---------- */
-  .mechs { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(12px, 2vw, 26px); margin-top: clamp(10px, 2vh, 20px); }
-  .mech {
-    background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
-    padding: clamp(14px, 2.2vh, 26px); box-shadow: var(--shadow);
-  }
-  .mech .ic { font-size: clamp(26px, 3.4vw, 44px); }
-  .mech b { display: block; font-size: clamp(15px, 1.8vw, 22px); margin: 6px 0 4px; color: var(--amber); }
-  .mech p { font-size: clamp(12px, 1.35vw, 16px); color: var(--muted); }
+  .formula { font-family: "JetBrains Mono", monospace; background: var(--surface2); border: 1px solid var(--line); border-radius: 10px; padding: clamp(9px, 1.6vh, 16px) clamp(12px, 1.6vw, 22px); font-size: clamp(11px, 1.35vw, 17px); margin-top: clamp(8px, 1.5vh, 16px); }
 
-  /* ---------- boss hp ---------- */
-  .boss-bar { max-width: 900px; margin-top: clamp(12px, 2.4vh, 24px); }
-  .boss-bar .boss-label { display: flex; justify-content: space-between; font-size: clamp(13px, 1.5vw, 18px); margin-bottom: 6px; }
-  .hp-track { height: clamp(16px, 2.6vh, 26px); border-radius: 999px; background: rgba(255,255,255,.08); border: 1px solid var(--line); overflow: hidden; }
-  .hp-fill { height: 100%; width: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--red), #FF9A5C); transition: width 1.6s cubic-bezier(.2,.8,.2,1); }
+  .src { font-size: clamp(9.5px, 1.05vw, 12.5px); color: var(--muted); margin-top: 8px; }
+  .footer-note { margin-top: clamp(10px, 2.2vh, 24px); font-size: clamp(10px, 1.15vw, 14px); color: rgba(155,160,136,.7); }
 
-  /* ---------- chrome ---------- */
+  /* chrome */
   #progress { position: fixed; top: 0; left: 0; height: 4px; background: var(--amber); z-index: 10; transition: width .3s ease; }
-  #counter {
-    position: fixed; bottom: 18px; right: 22px; z-index: 10;
-    font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--muted);
-  }
-  #ver { position: fixed; bottom: 18px; left: 22px; z-index: 10; font-size: 11px; color: rgba(155,160,136,.6); letter-spacing: .1em; }
-  #hint { position: fixed; bottom: 44px; right: 22px; z-index: 10; font-size: 11px; color: rgba(155,160,136,.5); }
-  .navbtn {
-    position: fixed; top: 50%; transform: translateY(-50%); z-index: 10;
-    width: 44px; height: 64px; border: none; cursor: pointer;
-    background: rgba(255,255,255,.04); color: var(--muted);
-    font-size: 22px; border-radius: 10px;
-  }
+  #counter { position: fixed; bottom: 16px; right: 20px; z-index: 10; font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--muted); }
+  #ver { position: fixed; bottom: 16px; left: 20px; z-index: 10; font-size: 10.5px; color: rgba(155,160,136,.6); letter-spacing: .1em; }
+  #hint { position: fixed; bottom: 38px; right: 20px; z-index: 10; font-size: 10.5px; color: rgba(155,160,136,.45); }
+  .navbtn { position: fixed; top: 50%; transform: translateY(-50%); z-index: 10; width: 40px; height: 60px; border: none; cursor: pointer; background: rgba(255,255,255,.04); color: var(--muted); font-size: 20px; border-radius: 10px; }
   .navbtn:hover { background: rgba(255,198,58,.15); color: var(--amber); }
-  #prev { left: 10px; } #next { right: 10px; }
-
-  #notes {
-    position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
-    background: rgba(10, 12, 5, 0.96); border-top: 2px solid var(--amber);
-    padding: 16px 28px 22px; font-size: 15px; color: var(--ink);
-    display: none; max-height: 38vh; overflow-y: auto;
-  }
+  .navbtn:focus-visible, a:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+  #prev { left: 8px; } #next { right: 8px; }
+  #notes { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: rgba(10,12,5,.97); border-top: 2px solid var(--amber); padding: 14px 26px 20px; font-size: 14.5px; display: none; max-height: 38vh; overflow-y: auto; }
   #notes.show { display: block; }
-  #notes .n-tag { color: var(--amber); font-weight: 800; font-size: 12px; letter-spacing: .18em; }
+  #notes .n-tag { color: var(--amber); font-weight: 800; font-size: 11.5px; letter-spacing: .18em; }
 
-  .footer-note { margin-top: clamp(12px, 2.6vh, 26px); font-size: clamp(11px, 1.2vw, 14px); color: rgba(155,160,136,.7); }
-
-  /* ---------- responsive ---------- */
-  @media (max-width: 820px) {
-    .cols { grid-template-columns: 1fr; }
-    .stat-row { grid-template-columns: 1fr; gap: 10px; }
-    .stat .num { font-size: 34px; }
-    .mechs { grid-template-columns: 1fr; }
-    .timeline { flex-direction: column; }
-    .evidence-grid { grid-template-columns: 1fr; }
-    .evidence-grid figure { max-height: 40vh; }
-    .slide { justify-content: flex-start; overflow-y: auto; padding-top: 48px; padding-bottom: 80px; }
+  @media (max-width: 860px) {
+    .cols, .cols.even { grid-template-columns: 1fr; }
+    .stat-row, .cards3, .kpi-cols, .refs { grid-template-columns: 1fr; gap: 8px; }
+    .gap-grid { grid-template-columns: 1fr; }
+    .gap-arrow { transform: rotate(90deg); text-align: center; }
+    .flow { flex-direction: column; }
+    .slide { justify-content: flex-start; overflow-y: auto; padding-top: 42px; padding-bottom: 70px; }
     .navbtn { display: none; }
+    figure img { max-height: 34vh; }
   }
-  @media (prefers-reduced-motion: reduce) {
-    .slide.active { transition: none; }
-    .hp-fill { transition: none; }
-  }
+  @media (prefers-reduced-motion: reduce) { .slide.active { transition: none; } }
 </style>
 </head>
 <body>
@@ -235,203 +174,275 @@
 
 <div id="deck">
 
-  <!-- ============ SLIDE 1 : TITLE ============ -->
-  <section class="slide" data-note="แนะนำชื่อกลุ่ม + อ่านชื่อหัวข้อ 1 รอบ ปิดด้วย: 'งานของเราตอบคำถามว่า ถ้าเปลี่ยนการปิดไฟให้กลายเป็นเกม พฤติกรรมคนในออฟฟิศจะเปลี่ยนจริงไหม' — ใช้เวลา 30 วิ อย่ายืด">
-    <div class="kicker">PBL Mini Project · Chapter 1</div>
-    <h1>ประหยัดไฟ<span class="accent">ให้เป็นเกม</span></h1>
-    <p class="lead" style="margin-top:18px">การใช้เกมมิฟิเคชันเพื่อส่งเสริมพฤติกรรมการประหยัดพลังงานไฟฟ้า<br>ของพนักงานในสำนักงาน</p>
-    <p class="lead" style="margin-top:10px; font-size:clamp(12px,1.3vw,16px)">Applying Gamification to Promote Energy-Saving Behavior of Employees in the Workplace</p>
-    <p class="footer-note">สมาชิกกลุ่ม: ภูมิ · เอมมี่ · หยก · ออย · โม &nbsp;|&nbsp; นำเสนอ 11 กรกฎาคม 2569</p>
-  </section>
+<!-- ===== 0 · TITLE ===== -->
+<section class="slide" data-note="เปิดสั้น 20 วิ: 'สัปดาห์ที่แล้วเราพบว่า 75% ของพนักงานเคยลืมปิดไฟ วันนี้เราจะเสนอว่าปัญหาจริงอยู่ตรงไหน และเราเลือกแก้ตรงไหน ด้วยเหตุผลอะไร'">
+  <div class="kicker">PBL · Digital Transformation Management</div>
+  <h1>ตรวจก่อนออก<span class="accent">.</span></h1>
+  <p class="lead" style="margin-top:16px">เปลี่ยนการปิดไฟในสำนักงานจาก <span class="red">"ความจำ"</span> → เป็น <span class="green">"มาตรฐานการทำงาน"</span></p>
+  <p class="lead" style="margin-top:8px;font-size:clamp(12px,1.3vw,16px)">Office Energy Saving — from Memory to Standard Procedure</p>
+  <p class="footer-note">ภูมิ · เอมมี่ · หยก · ออย · โม &nbsp;|&nbsp; กรณีศึกษา: Innovative Village (5 บริษัท 21 คน) &nbsp;|&nbsp; 1 สิงหาคม 2569</p>
+</section>
 
-  <!-- ============ SLIDE 2 : BACKGROUND ============ -->
-  <section class="slide" data-note="เปิดด้วยเรื่อง Fun Theory: 'ปี 2009 Volkswagen ติดเสียงเอฟเฟกต์ให้ถังขยะ — แค่ทิ้งแล้วมีเสียงตกเหวลึก ถังนั้นเก็บขยะได้เกือบ 2 เท่า พฤติกรรมคนเปลี่ยนง่ายที่สุดเมื่อทางเลือกที่ถูกต้องคือทางเลือกที่สนุกที่สุด' — 1 นาที">
-    <div class="kicker">Slide 2 · Background / Context</div>
-    <h2>ถ้าการปิดไฟ<span class="accent">สนุก</span>เท่าการเล่นเกม<br>จะเกิดอะไรขึ้น?</h2>
-    <div class="cols">
-      <div>
-        <ul class="points">
-          <li>สถานที่ศึกษา: <strong>Innovative Village</strong> — 5 บริษัท พนักงานรวม 21 คน</li>
-          <li>อุปกรณ์ที่พนักงานควบคุมเอง: ไฟส่องสว่าง · จอ/คอมพิวเตอร์ · เครื่องปรับอากาศ</li>
-          <li>พฤติกรรมที่พบ: เปิดทิ้งช่วง<strong>พักเที่ยง</strong> · ห้องประชุมว่างแต่แอร์ทำงาน · <strong>เลิกงาน</strong>แล้วไม่ปิด</li>
-          <li>แรงบันดาลใจ: <em>The Fun Theory (Volkswagen 2009)</em> — ถังขยะมีเสียง เก็บขยะได้ ×2</li>
-        </ul>
-      </div>
-      <div class="img-slot filled">
-        <img src="assets/slot1_office.webp" alt="ออฟฟิศตอนพักเที่ยง โต๊ะว่างแต่จอและไฟยังเปิด">
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ SLIDE 3 : PROBLEM ============ -->
-  <section class="slide" data-note="🔴 ห้ามพูดคำว่า 'ละเลย/ไม่ใส่ใจ/ขาดจิตสำนึก' — เน้นเสียง: 'จากการวิเคราะห์เบื้องต้น ปัญหานี้ไม่ใช่การขาดความรู้ — ทุกคนรู้ว่าควรปิด แต่เป็นการขาดแรงจูงใจและขาดข้อมูลป้อนกลับ เพราะค่าไฟเป็นค่าใช้จ่ายองค์กร ปิดหรือไม่ปิดผลต่อตัวเองเท่ากัน' — 1 นาที">
-    <div class="kicker">Slide 3 · Problem Statement</div>
-    <h2>ปัญหา: อุปกรณ์ไฟฟ้าถูก<span class="accent">เปิดทิ้งไว้</span><br>โดยไม่มีการใช้งาน</h2>
-    <p class="lead">พนักงานเปิดไฟส่องสว่าง จอคอมพิวเตอร์ และเครื่องปรับอากาศทิ้งไว้ — โดยเฉพาะช่วงพักเที่ยงและหลังเลิกงาน ทำให้องค์กรสิ้นเปลืองพลังงานและค่าใช้จ่ายโดยไม่จำเป็น</p>
-    <ul class="points">
-      <li>เกิดกับใคร: พนักงานทุกคน + องค์กรผู้จ่ายค่าไฟ</li>
-      <li>บ่อยแค่ไหน: <strong>ทุกวันทำงาน</strong> (ข้อมูลสำรวจจริงในสไลด์ถัดไป)</li>
-      <li>ข้อค้นพบสำคัญ: ไม่ใช่การขาดความรู้ — แต่คือ<em>การขาดแรงจูงใจ + ขาดข้อมูลป้อนกลับ (feedback)</em></li>
-    </ul>
-  </section>
-
-  <!-- ============ SLIDE 4 : EVIDENCE / IMPACT ============ -->
-  <section class="slide" data-note="'เราเดินสำรวจจริง 3 วัน พบจุดเปิดทิ้งเฉลี่ย ___ จุด/วัน คิดเป็นเงินปีละหลักหมื่นบาทที่หายไปโดยไม่มีใครได้ประโยชน์ ทุกหน่วยไฟที่เสียเปล่า = CO2 ~0.4-0.5 กก.' อัตราค่าไฟ 3.95 บาท/หน่วย (กกพ./PEA งวด พ.ค.-ส.ค.69) — 1:30 นาที สไลด์นี้คือจุดขาย">
-    <div class="kicker">Slide 4 · Evidence / Impact</div>
-    <h2>ตัวเลขจากออฟฟิศจริง <span class="accent">+ โลกจริง</span></h2>
-    <div class="evidence-grid">
-      <figure>
-        <img src="assets/audit1.webp" alt="ห้องทำงานใน Innovative Village เปิดไฟ แอร์ และพัดลมพร้อมกันขณะแทบไม่มีคน">
-        <figcaption>📷 ถ่ายจริงจากสำนักงานใน Innovative Village — ไฟเพดานทุกดวง แอร์ และพัดลม ทำงานพร้อมกันขณะไม่มีคนอยู่ในห้อง</figcaption>
-      </figure>
-      <div class="ev-right">
-        <div class="stat-compact"><div class="num" data-count="30" data-suffix="%">0%</div><div class="lab">ของพลังงานในอาคารสำนักงานถูกใช้อย่างสูญเปล่า (สถิติสากล)</div></div>
-        <div class="stat-compact"><div class="num" data-count="110" data-suffix=" ฿">0 ฿</div><div class="lab">ต่อเดือน ต่อแอร์ 1 เครื่อง ที่เปิดทิ้งแค่ชั่วพักเที่ยง (≈1,300 ฿/ปี/เครื่อง)</div></div>
-        <div class="stat-compact"><div class="num">CO₂ 0.5kg</div><div class="lab">ต่อไฟฟ้าทุก 1 หน่วยที่เสียเปล่า (grid factor ไทย ~0.4–0.5 kgCO₂/kWh)</div></div>
-        <div class="img-slot filled chart-box" style="flex:1; min-height:clamp(100px,20vh,220px)">
-          <img src="assets/iea_chart.webp" alt="กราฟ IEA: Total energy demand in the residential sector by end-use, 2023" style="object-fit:contain; min-height:0; flex:1;">
-          <div class="src">ที่มา: IEA — Total energy demand in the residential sector, by end-use (2023), Licence: CC BY 4.0</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ SLIDE 5 : WHY-WHY-WHY ============ -->
-  <section class="slide" data-note="ไฮไลต์ของการนำเสนอ — พูดช้าๆ ชัดๆ ตอนถึง ROOT CAUSE: 'พอต้นเหตุคือแรงจูงใจ ไม่ใช่ความรู้ วิธีแก้จึงไม่ใช่ป้ายรณรงค์ ไม่ใช่เซนเซอร์ตัดไฟ — แต่คือการออกแบบแรงจูงใจใหม่ นั่นคือที่มาของ Gamification' — 1:30 นาที">
-    <div class="kicker">Slide 5 · Why-Why-Why Analysis</div>
-    <h2>ขุดหา<span class="accent">ต้นเหตุที่แท้จริง</span></h2>
-    <div class="chain">
-      <div class="q"><b>ปัญหา</b> อุปกรณ์ไฟฟ้าถูกเปิดทิ้งไว้โดยไม่ใช้งาน</div>
-      <div class="arrow">▼ ทำไม?</div>
-      <div class="q"><b>Why 1</b> รีบออกไปพักเที่ยง / กลับบ้าน ไม่ทันสังเกต</div>
-      <div class="arrow">▼ ทำไมไม่สนใจจะปิด?</div>
-      <div class="q"><b>Why 2</b> มองว่าเป็นเรื่องเล็ก / ไม่ใช่หน้าที่ของตน</div>
-      <div class="arrow">▼ ทำไมรู้สึกว่าไม่ใช่หน้าที่?</div>
-      <div class="q"><b>Why 3</b> ค่าไฟเป็นค่าใช้จ่ายองค์กร ไม่กระทบตนเอง</div>
-      <div class="arrow">▼ ทำไมไม่รู้สึกมีส่วนร่วม?</div>
-      <div class="root">ROOT CAUSE: ขาดแรงจูงใจ + ขาดข้อมูลป้อนกลับที่มองเห็นได้
-        <span class="sub">ไม่ใช่ขาดความรู้ ไม่ใช่ความจำไม่ดี → ทางแก้คือ Behavior Design ไม่ใช่ Hardware → <b style="color:var(--amber)">GAMIFICATION</b></span>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ SLIDE 6 : TARGET GROUP ============ -->
-  <section class="slide" data-note="ผ่านเร็ว 30 วิ: 'เราเลือกสนามที่เราเข้าถึงได้จริงทุกวัน ตามหลักที่ว่าหัวข้อที่ดีคือหัวข้อที่เก็บข้อมูลได้จริง'">
-    <div class="kicker">Slide 6 · Target Group</div>
-    <h2>กลุ่มเป้าหมาย — <span class="accent">5 บริษัท · 21 คน</span> @ Innovative Village</h2>
-    <div class="cols">
-      <div>
-        <table class="vars">
-          <tr><td>CAS Cogniser</td><td>อาคาร B3, B4 · 4 คน</td></tr>
-          <tr><td>Innergylab</td><td>อาคาร B6 · 4 คน</td></tr>
-          <tr><td>Innovative Village</td><td>อาคาร A1 · 4 คน</td></tr>
-          <tr><td>IAgency</td><td>อาคาร C10 · 3 คน</td></tr>
-          <tr><td>Kiry</td><td>อาคาร B5 · 6 คน</td></tr>
-        </table>
-        <ul class="points" style="font-size:.85em">
-          <li>แบ่งเป็น <strong>5 ทีมตามบริษัท</strong> — ขอบเขตทีมชัดตามอาคารจริง เทียบคะแนนข้ามทีมได้</li>
-          <li>เหตุผลที่เลือก: ผู้วิจัยทำงานที่นี่จริง → เข้าถึงได้ทุกวัน เก็บข้อมูลซ้ำได้</li>
-        </ul>
-      </div>
-      <div class="img-slot filled">
-        <img src="assets/iv_map.webp" alt="แผนที่ Innovative Village แสดงตำแหน่งอาคารของ 5 บริษัท">
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ SLIDE 7 : HYPOTHESIS ============ -->
-  <section class="slide" data-note="กันคำถาม: 'เราให้ H1 เป็นตัวชี้ขาด เพราะ kWh รวมถูกอากาศรบกวน — เดือนร้อนแอร์กินไฟขึ้นทั้งที่พฤติกรรมดีขึ้น ส่วนจุดเปิดทิ้งวัดพฤติกรรมตรงๆ เกณฑ์ 30% อ้างงานทบทวนวรรณกรรม: gamification ลดพลังงาน 3-6% ถึง 20%+ งานเราวัดระดับพฤติกรรมซึ่งขยับแรงกว่า' — 1:30 นาที">
-    <div class="kicker">Slide 7 · Hypothesis</div>
-    <h2>สมมติฐาน<span class="accent">ที่วัดผลได้</span></h2>
-    <div class="hypo">
-      <div class="h-tag">H1 — สมมติฐานหลัก (วัดพฤติกรรม)</div>
-      <p>หลังใช้ระบบเกมมิฟิเคชัน 2 สัปดาห์ จำนวน "จุดเปิดอุปกรณ์ทิ้งไว้โดยไม่ใช้งาน" ต่อวัน <span class="green">ลดลงอย่างน้อย 30%</span> เทียบกับช่วง Baseline</p>
-    </div>
-    <div class="hypo secondary">
-      <div class="h-tag">H2 — สมมติฐานรอง (วัดพลังงาน)</div>
-      <p>ปริมาณการใช้ไฟฟ้ารายวัน (kWh) ในช่วงใช้ระบบ ต่ำกว่าช่วง Baseline</p>
-    </div>
-    <table class="vars">
-      <tr><td>ตัวแปรต้น</td><td>ระบบเกมมิฟิเคชัน (คะแนนทีม + leaderboard + streak)</td></tr>
-      <tr><td>ตัวแปรตาม</td><td>(1) จุดเปิดทิ้ง/วัน &nbsp;(2) kWh/วัน</td></tr>
-      <tr><td>วิธีวัด</td><td>Walk-through audit วันละ 2 รอบ (พักเที่ยง + หลังเลิกงาน) + จดมิเตอร์รายวัน</td></tr>
-      <tr><td>คุมตัวแปรกวน</td><td>บันทึกอุณหภูมิสูงสุดรายวัน + จำนวนคนเข้าออฟฟิศ ประกอบการวิเคราะห์</td></tr>
-    </table>
-  </section>
-
-  <!-- ============ SLIDE 8 : OBJECTIVE ============ -->
-  <section class="slide" data-note="อ่าน 3 ข้อแล้วชี้: 'สามข้อนี้คือ ศึกษา → พัฒนา → ทดสอบเปรียบเทียบ ตามลำดับการทำงานจริงในบทที่ 3' จบ ไม่ขยาย — 30 วิ">
-    <div class="kicker">Slide 8 · Objective</div>
-    <h2>วัตถุประสงค์</h2>
-    <ul class="points" style="font-size:1.1em">
-      <li><strong>ศึกษา</strong> — พฤติกรรมการใช้พลังงานไฟฟ้าและสาเหตุของการเปิดอุปกรณ์ทิ้งไว้ของพนักงานในสำนักงาน</li>
-      <li><strong>ออกแบบและพัฒนา</strong> — ระบบเกมมิฟิเคชันสำหรับส่งเสริมพฤติกรรมประหยัดพลังงาน</li>
-      <li><strong>เปรียบเทียบ</strong> — พฤติกรรมการใช้พลังงานก่อนและหลังการใช้ระบบเกมมิฟิเคชัน</li>
-    </ul>
-    <p class="footer-note">ศึกษา → พัฒนา → ทดสอบเปรียบเทียบ = ลำดับการดำเนินงานจริงในบทที่ 3</p>
-  </section>
-
-  <!-- ============ SLIDE 9 : SCOPE ============ -->
-  <section class="slide" data-note="'เรา scale down ให้พอดีกรอบ 1 เดือนครึ่ง สิ่งที่ตัดออกอย่างตั้งใจคือเซนเซอร์และแอป เพราะโจทย์คือทดสอบว่ากลไกแรงจูงใจได้ผลไหม ไม่ใช่สร้างซอฟต์แวร์' — 1 นาที">
-    <div class="kicker">Slide 9 · Scope</div>
-    <h2>ขอบเขต — <span class="accent">Scale Down ให้ทำจริงได้</span></h2>
-    <ul class="points">
-      <li>สถานที่: <strong>Innovative Village 1 แห่ง</strong> · กลุ่มตัวอย่าง 21 คน จาก 5 บริษัท (5 ทีมตามบริษัท/อาคาร)</li>
-      <li>อุปกรณ์ที่นับ: ไฟส่องสว่าง · จอ/คอมพิวเตอร์ · เครื่องปรับอากาศ <em>เท่านั้น</em> (ไม่รวมอุปกรณ์ที่ต้องเปิดตลอด)</li>
-      <li>ระบบเป็น Prototype: Google Form + Sheets + โปสเตอร์ — <strong>ไม่พัฒนาแอป ไม่ติดตั้ง IoT</strong></li>
-    </ul>
-    <div class="timeline">
-      <div class="phase p1"><b>สัปดาห์ 1–2 · Baseline</b><span>เก็บข้อมูลพื้นฐาน: audit วันละ 2 รอบ + จดมิเตอร์ (ยังไม่เปิดตัวเกม)</span></div>
-      <div class="phase p2"><b>สัปดาห์ 3–4 · Gamification</b><span>เปิดระบบเกม เก็บข้อมูลด้วยวิธีเดิมเป๊ะ + ตรวจสุ่มเวลา</span></div>
-      <div class="phase p3"><b>สัปดาห์ 5–6 · Analysis</b><span>เปรียบเทียบก่อน–หลัง · Accept/Reject H1 · สรุปผล</span></div>
-    </div>
-  </section>
-
-  <!-- ============ SLIDE 10 : EXPECTED OUTCOME ============ -->
-  <section class="slide" data-note="โชว์มาสคอต แล้วปิด: 'ต่อให้ผลออกมา Reject สมมติฐาน งานนี้ก็สำเร็จเชิงระเบียบวิธี เพราะเราจะรู้ด้วยข้อมูลจริงว่าอะไรได้ผลหรือไม่ได้ผลกับคนในองค์กรจริงๆ — ขอบคุณครับ' — 1 นาที (หลอด HP บอสจะวิ่งลงอัตโนมัติตอนเปิดสไลด์)">
-    <div class="kicker">Slide 10 · Expected Outcome</div>
-    <h2>ระบบเกม 3 ชั้น ที่ทั้งออฟฟิศ<span class="accent">เล่นด้วยกัน</span></h2>
-    <div class="mechs">
-      <div class="mech"><div class="ic">🐣</div><b>มาสคอตประจำโซน</b><p>สุขภาพน้องอัพเดตทุกเย็นจากผลตรวจ — feedback ที่มองเห็นและผูกใจ (ต้นแบบ: Energy Chickens −13%)</p></div>
-      <div class="mech"><div class="ic">🏆</div><b>ลีกโซน + Streak</b><p>แข่งรายสัปดาห์ ธงแชมป์ของจริง + streak โบนัส — แรงจูงใจจากการแข่งขัน (ต้นแบบ: OPOWER / Cool Choices)</p></div>
-      <div class="mech"><div class="ic">👾</div><b>บอส "เจ้าวัตต์ผลาญ"</b><p>ทั้งออฟฟิศร่วมตี HP บอส ล้มได้ = เลี้ยงขนมทุกคน — โหมดร่วมมือ กันทีมท้ายตารางหมดใจ</p></div>
-    </div>
-    <div class="boss-bar">
-      <div class="boss-label"><span>👾 เจ้าวัตต์ผลาญ</span><span class="mono" id="boss-hp">HP 100%</span></div>
-      <div class="hp-track"><div class="hp-fill" id="hp-fill"></div></div>
-    </div>
-    <div class="cols" style="margin-top:clamp(10px,2vh,20px)">
-      <ul class="points" style="font-size:.92em">
-        <li>ได้ข้อมูลอัตราการเปิดทิ้งจริงที่องค์กรไม่เคยมี</li>
-        <li>ผลก่อน–หลังที่ตอบได้ว่าเกมมิฟิเคชันเปลี่ยนพฤติกรรมจริงไหม (Accept/Reject H1)</li>
-        <li>Future Work: maintenance mode ระยะยาว + ขยายโมเดลไปแยกขยะ / ประหยัดน้ำ</li>
+<!-- ===== 1 · PROBLEM ===== -->
+<section class="slide" data-note="ออยพูด · 'จากการสัมภาษณ์และแบบสอบถามพนักงานในสำนักงานจริง พบว่า 75% เคยลืมปิดไฟ และเกิดซ้ำในช่วงเดิม ๆ คือช่วงเปลี่ยนกิจกรรม — พักเที่ยง เข้าประชุม ออกจากพื้นที่ชั่วคราว' Key message: ลืมปิดไฟยังเกิดขึ้น แม้พนักงานตระหนักเรื่องประหยัดพลังงานแล้ว">
+  <div class="kicker">1 · Problem</div>
+  <h2>พนักงาน <span class="accent">75%</span> เคยลืมปิดไฟ</h2>
+  <div class="cols">
+    <div>
+      <ul class="points">
+        <li>เกิดซ้ำในช่วง <strong>เปลี่ยนกิจกรรม</strong> — พักเที่ยง · เข้าประชุม · ออกจากพื้นที่ชั่วคราว</li>
+        <li>พบไฟเปิดทิ้งไว้ <strong>ทั้งที่ไม่มีผู้ใช้งาน</strong> ในห้องทำงานและห้องประชุม</li>
+        <li>เป็นการใช้พลังงานที่ <strong>ไม่เกิดประโยชน์ใด ๆ</strong> ต่อองค์กร</li>
+        <li>ที่มาข้อมูล: <em>สัมภาษณ์ + แบบสอบถามพนักงานจริงใน Innovative Village</em></li>
       </ul>
-      <div class="img-slot filled" style="min-height:clamp(120px,24vh,240px)">
-        <img src="assets/slot5_mascots.webp" alt="มาสคอตสไลม์ผลไม้ 3 ตัวบน podium">
+      <div class="callout warn">พนักงาน <b>ไม่ได้ขาดความรู้</b> — ทุกคนรู้ว่าควรปิด แต่ยังลืมอยู่ดี</div>
+    </div>
+    <figure>
+      <img src="assets/audit1.webp" alt="ห้องทำงานเปิดไฟ แอร์ และพัดลมทิ้งไว้ขณะไม่มีผู้ใช้งาน">
+      <figcaption>📷 ถ่ายจริงจากสำนักงานใน Innovative Village — ไฟเพดาน แอร์ และพัดลม ทำงานพร้อมกันขณะไม่มีคนอยู่</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ===== 2 · ROOT CAUSE ===== -->
+<section class="slide" data-note="ออยพูด · 'เราถามต่อว่าทำไมถึงลืม ได้ 3 สาเหตุหลักจากปากพนักงานเอง' เน้นประโยคปิด: 'การลืมเกิดจากสถานการณ์ระหว่างเปลี่ยนกิจกรรม ไม่ใช่จากการขาดความรู้' — ห้ามใช้คำว่า ละเลย/ไม่ใส่ใจ/ขาดจิตสำนึก">
+  <div class="kicker">2 · Root Cause</div>
+  <h2>ทำไมถึงลืม — <span class="accent">3 สาเหตุจากปากพนักงาน</span></h2>
+  <div class="cards3">
+    <div class="card">
+      <div class="ic">🏃</div><b>รีบไปทำกิจกรรมถัดไป</b>
+      <p>ความสนใจย้ายไปงานถัดไปก่อนที่จะได้ตรวจสอบห้อง</p>
+      <div class="tagline">→ ข้อจำกัดด้านความจำและความสนใจ</div>
+    </div>
+    <div class="card">
+      <div class="ic">👥</div><b>คิดว่าจะมีคนมาใช้ต่อ</b>
+      <p>ไม่แน่ใจว่าตนเองเป็นคนสุดท้ายหรือไม่ จึงไม่ได้ปิด</p>
+      <div class="tagline">→ ความคาดหวังร่วมในพื้นที่ส่วนกลาง</div>
+    </div>
+    <div class="card">
+      <div class="ic">🚪</div><b>ออกจากห้องโดยไม่ตรวจสอบ</b>
+      <p>ไม่มีจังหวะหรือสิ่งกระตุ้นให้หันกลับไปดูสถานะไฟ</p>
+      <div class="tagline">→ จุดที่องค์กรเข้าไปออกแบบได้</div>
+    </div>
+  </div>
+  <div class="callout">การลืมเกิดจาก <b>สถานการณ์ระหว่างเปลี่ยนกิจกรรม</b> มากกว่าการขาดความรู้</div>
+</section>
+
+<!-- ===== 3 · GAP ANALYSIS ===== -->
+<section class="slide" data-note="ออยพูด · 'พอเทียบสิ่งที่พนักงานรู้ กับสิ่งที่องค์กรมี เราเจอช่องว่างชัดเจน' ปิดด้วย: 'ปัญหาไม่ได้อยู่ที่ไม่รู้ว่าต้องปิด แต่อยู่ที่ไม่มีระบบช่วยให้ตรวจสอบก่อนออก'">
+  <div class="kicker">3 · Gap Analysis</div>
+  <h2>ช่องว่างระหว่าง <span class="green">สิ่งที่รู้</span> กับ <span class="red">สิ่งที่มี</span></h2>
+  <div class="gap-grid">
+    <div class="gap-box know">
+      <h4 class="green">พนักงานรู้อยู่แล้ว</h4>
+      <ul>
+        <li>คนสุดท้ายควรเป็นคนปิดไฟ</li>
+        <li>การประหยัดพลังงานเป็นเรื่องสำคัญ</li>
+        <li>เปิดทิ้งไว้ทำให้ค่าไฟองค์กรสูงขึ้น</li>
+      </ul>
+    </div>
+    <div class="gap-arrow">➜</div>
+    <div class="gap-box miss">
+      <h4 class="red">แต่องค์กรยังไม่มี</h4>
+      <ul>
+        <li>มาตรฐานการตรวจสอบก่อนออกจากพื้นที่</li>
+        <li>Checklist หรือขั้นตอนที่เป็นรูปธรรม</li>
+        <li>Prompt / สิ่งเตือนในจังหวะที่ตัดสินใจ</li>
+        <li>การติดตามผลว่าทำจริงหรือไม่</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout">ปัจจุบันการปิดไฟยังอาศัย <b>ความจำของแต่ละบุคคล</b> เพียงอย่างเดียว — ซึ่งคือสาเหตุของปัญหาอยู่แล้ว</div>
+</section>
+
+<!-- ===== 4 · LITERATURE REVIEW ===== -->
+<section class="slide" data-note="หยกพูด (2-3 นาที) · ไล่ทีละงาน แล้วปิดด้วย Key message: 'การบอกให้ประหยัดไฟอย่างเดียวไม่พอ ต้องมี Trigger และ Feedback' — ถ้าอาจารย์ถามลึก ให้ยก Bicchieri อธิบายว่าทำไมคนคิดว่าจะมีคนมาใช้ต่อ">
+  <div class="kicker">4 · Literature Review</div>
+  <h2>งานวิจัยที่รองรับ <span class="accent">แนวทางที่เราเลือก</span></h2>
+  <div class="refs">
+    <div class="ref">
+      <b>Prospective Memory</b>
+      <p>คนมักลืมสิ่งที่ตั้งใจจะทำ เมื่อมีการ<em>เปลี่ยนกิจกรรม</em>หรือถูกขัดจังหวะ — ตรงกับสาเหตุที่ 1 ของเรา</p>
+      <div class="cite">Finstad et al. (2006), Applied Cognitive Psychology</div>
+    </div>
+    <div class="ref">
+      <b>Social Norms &amp; Mutual Expectations</b>
+      <p>คนตัดสินใจจากความเชื่อว่า<em>ผู้อื่นจะทำอะไร</em> จึงเกิดการคิดว่า "เดี๋ยวก็มีคนมาใช้ต่อ" — ตรงกับสาเหตุที่ 2</p>
+      <div class="cite">Bicchieri (2005), The Grammar of Society</div>
+    </div>
+    <div class="ref">
+      <b>Prompts ลดการใช้พลังงานได้จริง</b>
+      <p>การติดข้อความเตือน<em>ตรงจุดใช้งาน</em>ในสำนักงาน ช่วยให้คนปิดไฟตอนออกจากห้องมากขึ้น และข้อความเชิงความรับผิดชอบร่วมได้ผลดีกว่าคำสั่ง</p>
+      <div class="cite">Simple prompts reduce inadvertent energy consumption (2014)</div>
+    </div>
+    <div class="ref">
+      <b>Responsibility &amp; Perceived Control</b>
+      <p>พฤติกรรมประหยัดพลังงานในพื้นที่ส่วนรวมสัมพันธ์กับ<em>ความชัดเจนของความรับผิดชอบ</em>และความสะดวกในการควบคุมอุปกรณ์</p>
+      <div class="cite">Frontiers in Built Environment (2020) · Frontiers in Psychology (2025, บริบทไทย)</div>
+    </div>
+  </div>
+  <div class="callout">การบอกให้ประหยัดไฟอย่างเดียว <b>ไม่เพียงพอ</b> — ต้องมี <b>Trigger</b> (สิ่งกระตุ้นถูกที่ถูกเวลา) และ <b>Feedback</b></div>
+</section>
+
+<!-- ===== 5 · PROPOSED SOLUTION ===== -->
+<section class="slide" data-note="โมพูด · เหตุผลของการเลือก: 'สาเหตุที่ 1 กับ 2 เป็นพฤติกรรมส่วนบุคคล คุมยาก ส่วนการติดเซนเซอร์มีต้นทุนและยังพิสูจน์ความคุ้มค่าไม่ได้ เราจึงเลือกแก้ที่สาเหตุที่ 3 ซึ่งองค์กรสร้างมาตรฐานร่วมกันได้' — ถ้าอาจารย์ถามว่าทำไมไม่ทำเกม ตอบ: เพราะ root cause คือการลืมตรวจสอบ ไม่ใช่การขาดแรงจูงใจ">
+  <div class="kicker">5 · Proposed Solution</div>
+  <h2>เลือกแก้ที่ <span class="accent">"ไม่ได้ตรวจสอบก่อนออก"</span></h2>
+  <div class="cols">
+    <div>
+      <div class="tbl-wrap">
+        <table class="vars">
+          <tr><th>สาเหตุ</th><th>ประเมิน</th></tr>
+          <tr class="lose"><td>รีบไปทำกิจกรรมอื่น</td><td>พฤติกรรมส่วนบุคคล — ควบคุมได้ยาก</td></tr>
+          <tr class="lose"><td>คิดว่าจะมีคนมาใช้ต่อ</td><td>ความเชื่อส่วนบุคคล — เปลี่ยนได้ช้า</td></tr>
+          <tr class="win"><td>ไม่ได้ตรวจสอบก่อนออก</td><td><b>องค์กรสร้างมาตรฐานร่วมกันได้ทันที</b></td></tr>
+        </table>
+      </div>
+      <div class="callout">เปลี่ยนการปิดไฟจาก <b class="red">"ความจำ"</b> → เป็น <b class="green">"มาตรฐานการทำงาน"</b></div>
+      <p class="src">หมายเหตุ: เซนเซอร์/ระบบปิดอัตโนมัติยังไม่ตัดทิ้ง แต่จัดเป็นระยะถัดไป เนื่องจากมีต้นทุนและต้องพิสูจน์ความคุ้มค่าก่อน (ดูสไลด์ 8)</p>
+    </div>
+    <figure>
+      <img src="assets/sol_sign.webp" alt="ป้ายเตือนเล็ก ๆ ติดข้างมือจับประตูและสวิตช์ไฟ ตำแหน่งที่ตัดสินใจก่อนออกจากห้อง">
+      <figcaption>Trigger วางไว้ ณ จุดตัดสินใจ — ข้างมือจับประตูและสวิตช์ไฟ ก่อนก้าวออกจากห้อง</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ===== 6 · SOLUTION DESIGN ===== -->
+<section class="slide" data-note="โมพูด · ไล่ 4 องค์ประกอบแล้วเดิน workflow ทีละขั้น เน้นว่าขั้น 'ยืนยัน' คือสิ่งที่ทำให้วัดผลได้ ไม่ใช่แค่ติดป้ายแล้วจบ · ถ้อยคำบนป้ายต้องเป็นการกระตุ้น ไม่ใช่การตำหนิ">
+  <div class="kicker">6 · Solution Design</div>
+  <h2>องค์ประกอบ + <span class="accent">ขั้นตอนการทำงาน</span></h2>
+  <div class="cards3" style="grid-template-columns:repeat(4,1fr)">
+    <div class="card"><div class="ic">📋</div><b>Standard</b><p>กำหนดชัดว่าใครตรวจ ตรวจอะไร ตรวจเมื่อไร</p></div>
+    <div class="card"><div class="ic">🔔</div><b>Prompt</b><p>ป้ายเตือนที่ประตู/สวิตช์ — ถ้อยคำกระตุ้น ไม่ตำหนิ</p></div>
+    <div class="card"><div class="ic">✅</div><b>Checklist / QR</b><p>สแกนยืนยันการตรวจ ใช้เวลา 5 วินาที</p></div>
+    <div class="card"><div class="ic">📊</div><b>Feedback</b><p>สรุปผลรายสัปดาห์ให้ทีมเห็นร่วมกัน</p></div>
+  </div>
+  <div class="flow">
+    <div class="step"><b>1 · ก่อนออก</b><span>ป้ายเตือนสะดุดตาที่จุดตัดสินใจ</span></div>
+    <div class="step"><b>2 · ตรวจ</b><span>มีคนอยู่ในห้องหรือไม่</span></div>
+    <div class="step"><b>3 · ปิด</b><span>ไฟ · แอร์ · อุปกรณ์ที่ไม่ใช้</span></div>
+    <div class="step"><b>4 · ยืนยัน</b><span>สแกน QR / ติ๊ก checklist</span></div>
+    <div class="step"><b>5 · สรุปผล</b><span>Feedback กลับไปที่ทีม</span></div>
+  </div>
+  <div class="callout">ข้อความบนป้ายเป็นการ <b>กระตุ้นให้ตรวจสอบ</b> เช่น "เป็นคนสุดท้ายหรือไม่ ตรวจไฟก่อนออก" — ไม่ใช้ถ้อยคำตำหนิ เพราะไม่ได้แก้สาเหตุด้านความจำ</div>
+</section>
+
+<!-- ===== 7 · EVALUATION ===== -->
+<section class="slide" data-note="เอมมี่พูด · 'เราวัด 3 ด้าน โดยด้านพฤติกรรมเป็นตัวชี้ขาด เพราะหน่วยไฟรวมถูกอากาศและจำนวนคนรบกวน' · ย้ำว่าต้องเก็บ baseline ก่อน 2-4 สัปดาห์ ถึงจะเทียบก่อน-หลังได้">
+  <div class="kicker">7 · Evaluation</div>
+  <h2>วัดผลอย่างไร — <span class="accent">3 ด้าน</span></h2>
+  <div class="kpi-cols">
+    <div class="kpi">
+      <h4>① ด้านพฤติกรรม <span class="green">(ตัวชี้ขาด)</span></h4>
+      <li>อัตราการตรวจสอบก่อนออก (%)</li>
+      <li>จำนวนครั้งที่พบไฟเปิดทิ้ง/สัปดาห์</li>
+      <li>อัตราการทำ Checklist ครบ</li>
+    </div>
+    <div class="kpi">
+      <h4>② ด้านพลังงาน</h4>
+      <li>ชั่วโมงที่ไฟเปิดโดยไม่มีคนอยู่</li>
+      <li>หน่วยไฟฟ้า (kWh) ที่ลดลง</li>
+      <li>ค่าไฟที่ประหยัดได้ (บาท)</li>
+    </div>
+    <div class="kpi">
+      <h4>③ ด้านเศรษฐศาสตร์</h4>
+      <li>ต้นทุนรวมของมาตรการ</li>
+      <li>ROI</li>
+      <li>ระยะเวลาคืนทุน</li>
+    </div>
+  </div>
+  <div class="callout warn">ให้ <b>ตัวชี้วัดด้านพฤติกรรม</b> เป็นตัวชี้ขาด เพราะหน่วยไฟรวมถูกรบกวนด้วยสภาพอากาศและจำนวนคนเข้าออฟฟิศ — ต้องเก็บ <b>Baseline 2–4 สัปดาห์</b> ก่อนเริ่มมาตรการ</div>
+</section>
+
+<!-- ===== 8 · COST-EFFECTIVENESS ===== -->
+<section class="slide" data-note="เอมมี่พูด — สไลด์ตอบอาจารย์โดยตรง! · 'อาจารย์ให้ไปดูว่าเปิดไฟทิ้งมีค่าใช้จ่ายเท่าไรเทียบกับต้นทุนติดตั้ง เราคำนวณแล้วพบว่า ถ้าคิดเฉพาะไฟส่องสว่าง การติดเซนเซอร์คืนทุนนานถึง ~5 ปี แต่มาตรการป้ายเตือน+checklist คืนทุนภายในเดือนเดียว นี่คือเหตุผลเชิงตัวเลขที่เราเลือกทางนี้ก่อน' ⚠️ ย้ำว่าเป็นตัวเลขประมาณการ รอแทนด้วยบิลจริงที่เก็บมาแล้ว">
+  <div class="kicker">8 · Cost-effectiveness</div>
+  <h2>คุ้มไหม — <span class="accent">คำนวณแล้วจึงเลือก</span></h2>
+  <div class="tbl-wrap">
+    <table class="vars">
+      <tr><th>แนวทาง</th><th>ต้นทุน/ห้อง</th><th>ประหยัด/เดือน/ห้อง</th><th>ระยะคืนทุน</th></tr>
+      <tr class="win"><td>ป้ายเตือน + Checklist</td><td class="num">~50–200 ฿</td><td class="num">~19–225 ฿</td><td class="num green">&lt; 1 เดือน ✓</td></tr>
+      <tr class="lose"><td>เซนเซอร์ (คิดเฉพาะไฟ)</td><td class="num">~1,500 ฿</td><td class="num">~19 ฿</td><td class="num red">~5–6 ปี ✕</td></tr>
+      <tr><td>เซนเซอร์ (ไฟ + แอร์)</td><td class="num">~1,500 ฿</td><td class="num">~225 ฿</td><td class="num">~7 เดือน</td></tr>
+    </table>
+  </div>
+  <div class="formula">ระยะเวลาคืนทุน = ต้นทุนของ Solution ÷ เงินที่ประหยัดได้ต่อเดือน &nbsp;|&nbsp; ค่าไฟ 3.95 ฿/หน่วย (กกพ. งวด พ.ค.–ส.ค. 69)</div>
+  <div class="callout">ตัวเลขยืนยันว่ามาตรการ <b>ต้นทุนต่ำควรมาก่อน</b> — ไม่ได้เลือกเพราะทำง่าย แต่เลือกเพราะคำนวณแล้วคุ้มกว่าในระยะแรก</div>
+  <p class="src">⚠️ ตัวเลขข้างต้นเป็นการประมาณการเบื้องต้น (สมมติ LED 6 หลอด/ห้อง เปิดทิ้ง 2 ชม./วัน × 22 วัน) — อยู่ระหว่างแทนค่าด้วยบิลค่าไฟจริงของทั้ง 5 บริษัทที่เก็บมาแล้ว</p>
+</section>
+
+<!-- ===== 9 · ENERGY DATA COLLECTION ===== -->
+<section class="slide" data-note="ออยพูด · 'ข้อมูลชุดนี้คือ baseline ที่จำเป็นก่อนจะบอกได้ว่ามาตรการได้ผลจริงไหม เราเริ่มเก็บบิลค่าไฟจากบริษัทในพื้นที่แล้ว' · ระบุว่าเก็บครบ 5 บริษัท 21 คน">
+  <div class="kicker">9 · Energy Data Collection</div>
+  <h2>ข้อมูลพื้นฐานที่ต้องเก็บ <span class="accent">ก่อนวัดผล</span></h2>
+  <div class="cols">
+    <div>
+      <ul class="points sm">
+        <li><strong>ค่าไฟย้อนหลัง</strong> ของแต่ละบริษัท (เก็บแล้ว)</li>
+        <li><strong>จำนวนหลอดไฟ</strong> และกำลังไฟแต่ละพื้นที่</li>
+        <li><strong>จำนวนเครื่องปรับอากาศ</strong> และชั่วโมงใช้งาน</li>
+        <li><strong>จำนวนพนักงาน</strong> และพื้นที่สำนักงาน</li>
+      </ul>
+      <div class="tbl-wrap">
+        <table class="vars">
+          <tr><th>บริษัท</th><th>อาคาร</th><th>พนักงาน</th></tr>
+          <tr><td>CAS Cogniser</td><td>B3, B4</td><td class="num">4</td></tr>
+          <tr><td>Innergylab</td><td>B6</td><td class="num">4</td></tr>
+          <tr><td>Innovative Village</td><td>A1</td><td class="num">4</td></tr>
+          <tr><td>IAgency</td><td>C10</td><td class="num">3</td></tr>
+          <tr><td>Kiry</td><td>B5</td><td class="num">6</td></tr>
+        </table>
       </div>
     </div>
-  </section>
+    <figure>
+      <img src="assets/iv_map.webp" alt="แผนที่ Innovative Village แสดงตำแหน่งอาคารของ 5 บริษัทกลุ่มเป้าหมาย">
+      <figcaption>พื้นที่ศึกษา: Innovative Village — 5 บริษัท 21 คน กระจายตามอาคาร A1 / B3–B6 / C10</figcaption>
+    </figure>
+  </div>
+</section>
 
-  <!-- ============ SLIDE 11 : Q&A APPENDIX ============ -->
-  <section class="slide" data-note="สไลด์สำรอง — เปิดเฉพาะตอนโดนถาม ไม่ต้องนำเสนอ">
-    <div class="kicker">Appendix · เตรียมตอบคำถาม</div>
-    <h2>Q&amp;A</h2>
-    <ul class="points" style="font-size:.85em">
-      <li><strong>ทำไมไม่ติดเซนเซอร์ตัดไฟ?</strong> — เซนเซอร์แก้อาการไม่แก้พฤติกรรม · แพงกว่าหลายเท่า · งานเราศึกษา behavior change ที่ขยายไปเรื่องอื่นได้</li>
-      <li><strong>อากาศร้อนขึ้น ค่าไฟจะไม่ลดหรือเปล่า?</strong> — ใช่ จึงให้ H1 (พฤติกรรมตรง ๆ) เป็นตัวชี้ขาด + จดอุณหภูมิรายวันประกอบ</li>
-      <li><strong>คนจะปิดเฉพาะก่อนตรวจไหม?</strong> — มีรอบตรวจสุ่มเวลา (ตรวจสายฟ้าแลบ) เป็นทั้งกลไกเกม + คุมคุณภาพข้อมูล</li>
-      <li><strong>เกมจบแล้วพฤติกรรมกลับไปเดิมไหม?</strong> — Energy Chickens พบว่าจริง เราไม่อ้างว่าแก้ถาวร → เสนอ maintenance mode เป็น Future Work · Cool Choices พบว่า public accountability ช่วยให้ผลคงอยู่</li>
-      <li><strong>มั่นใจได้ไงว่าเกมได้ผล?</strong> — ออฟฟิศจริงลดได้ 13% (Energy Chickens 2014) · review ทั้งสาขา 3–6% ถึง 20%+ — เราทำตามหลักฐาน ไม่ได้เดา</li>
-    </ul>
-  </section>
+<!-- ===== 10 · EXPECTED OUTCOME ===== -->
+<section class="slide" data-note="เอมมี่พูดปิด · 'สิ่งที่เราคาดหวังไม่ใช่แค่ค่าไฟลด แต่คือองค์กรมีมาตรฐานที่ทำซ้ำได้ และมีข้อมูลพอที่จะตัดสินใจเรื่องเซนเซอร์ในระยะถัดไป' ปิดท้าย: 'ถ้าผลออกมาว่ามาตรการไม่ได้ผล เราก็จะรู้ด้วยข้อมูลจริง ไม่ใช่การเดา — ขอบคุณครับ/ค่ะ'">
+  <div class="kicker">10 · Expected Outcome</div>
+  <h2>ผลลัพธ์ที่คาดหวัง</h2>
+  <div class="cols">
+    <div>
+      <ul class="points">
+        <li>สำนักงานมี <strong>มาตรฐานการตรวจสอบก่อนออก</strong> ที่ทำซ้ำได้และวัดผลได้</li>
+        <li><strong>จำนวนครั้งที่พบไฟเปิดทิ้งลดลง</strong> เทียบกับช่วง Baseline</li>
+        <li>ได้ <strong>ข้อมูลการใช้พลังงานจริง</strong> ที่องค์กรไม่เคยมีมาก่อน</li>
+        <li>มีฐานตัวเลขพอสำหรับตัดสินใจว่า <em>ควรลงทุนเซนเซอร์ในระยะถัดไปหรือไม่</em></li>
+      </ul>
+      <div class="callout">ต่อให้ผลออกมาว่ามาตรการยังไม่พอ งานนี้ก็สำเร็จเชิงระเบียบวิธี — เพราะจะรู้ด้วย <b>ข้อมูลจริง</b> ไม่ใช่การเดา</div>
+    </div>
+    <figure>
+      <img src="assets/sol_outcome.webp" alt="สำนักงานหลังเลิกงานที่ปิดไฟและอุปกรณ์เรียบร้อย">
+      <figcaption>ภาพเป้าหมาย: ห้องว่าง = ไฟดับ โดยไม่ต้องพึ่งความจำของใครคนใดคนหนึ่ง</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ===== 11 · Q&A ===== -->
+<section class="slide" data-note="สไลด์สำรอง เปิดเฉพาะตอนโดนถาม">
+  <div class="kicker">Appendix · เตรียมตอบคำถาม</div>
+  <h2>Q&amp;A</h2>
+  <ul class="points sm">
+    <li><strong>ทำไมไม่ติดเซนเซอร์เลย?</strong> — คำนวณแล้ว: ถ้าคิดเฉพาะไฟส่องสว่าง คืนทุน ~5 ปี · และมีความเสี่ยงตัดไฟขณะพนักงานนั่งนิ่ง ๆ · จัดเป็นระยะถัดไปหลังมีข้อมูล baseline</li>
+    <li><strong>ทำไมไม่ทำ Gamification?</strong> — Root cause คือ<em>การลืมตรวจสอบ</em> ไม่ใช่การขาดแรงจูงใจ · แรงจูงใจแก้ปัญหาความจำไม่ได้โดยตรง</li>
+    <li><strong>ป้ายเตือนอย่างเดียวจะพอเหรอ?</strong> — ไม่ได้มีแค่ป้าย มี Standard + Checklist ยืนยัน + Feedback · และมีงานวิจัยรองรับว่า prompt ตรงจุดใช้งานลดการเปิดไฟทิ้งได้จริง</li>
+    <li><strong>วัดผลยังไงให้เชื่อถือได้?</strong> — Baseline 2–4 สัปดาห์ก่อนเริ่ม แล้วเทียบก่อน–หลังด้วยวิธีเก็บเดิมเป๊ะ · ใช้ตัวชี้วัดพฤติกรรมเป็นหลักเพราะ kWh ถูกอากาศรบกวน</li>
+    <li><strong>ข้อมูลสัมภาษณ์น้อยไปไหม?</strong> — ยอมรับเป็นข้อจำกัด (ผู้ให้ข้อมูล 3 คน + แบบสอบถาม) จึงต้องใช้ร่วมกับการสังเกตและการตรวจวัดจริง</li>
+  </ul>
+</section>
 
 </div>
 
 <button class="navbtn" id="prev" aria-label="สไลด์ก่อนหน้า">‹</button>
 <button class="navbtn" id="next" aria-label="สไลด์ถัดไป">›</button>
-<div id="counter">1 / 11</div>
+<div id="counter">1 / 12</div>
 <div id="hint">← → เปลี่ยนสไลด์ · N = โน้ตผู้พูด · F = เต็มจอ</div>
-<div id="ver">PBL-SLIDES v0.1.5</div>
+<div id="ver">PBL-SLIDES v0.2.0</div>
 <div id="notes"><span class="n-tag">SPEAKER NOTES</span><p id="note-text"></p></div>
 
 <script>
@@ -451,7 +462,7 @@
       counted.add(el);
       const target = parseInt(el.dataset.count, 10);
       const suffix = el.dataset.suffix || '';
-      const t0 = performance.now(), dur = 1100;
+      const t0 = performance.now(), dur = 1000;
       function tick(t) {
         const p = Math.min((t - t0) / dur, 1);
         el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3))) + suffix;
@@ -459,23 +470,6 @@
       }
       requestAnimationFrame(tick);
     });
-  }
-
-  let bossPlayed = false;
-  function bossAnim(slide) {
-    const fill = slide.querySelector('#hp-fill');
-    if (!fill || bossPlayed) return;
-    bossPlayed = true;
-    const label = document.getElementById('boss-hp');
-    setTimeout(() => {
-      fill.style.width = '38%';
-      let hp = 100;
-      const iv = setInterval(() => {
-        hp -= 2;
-        if (hp <= 38) { hp = 38; clearInterval(iv); }
-        label.textContent = 'HP ' + hp + '%';
-      }, 45);
-    }, 600);
   }
 
   function show(i) {
@@ -486,7 +480,6 @@
     noteText.textContent = slides[idx].dataset.note || '';
     location.hash = idx + 1;
     animateCounters(slides[idx]);
-    bossAnim(slides[idx]);
   }
 
   document.getElementById('next').onclick = () => show(idx + 1);
@@ -511,18 +504,17 @@
 
   show(idx);
 
-  /* ---------- particle background: drifting energy sparks ---------- */
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const cv = document.getElementById('bg-canvas');
   const ctx = cv.getContext('2d');
   let W, H, parts = [];
   function resize() {
     W = cv.width = innerWidth; H = cv.height = innerHeight;
-    parts = Array.from({ length: Math.min(70, W / 20) }, () => ({
+    parts = Array.from({ length: Math.min(60, W / 22) }, () => ({
       x: Math.random() * W, y: Math.random() * H,
-      r: Math.random() * 1.8 + 0.4,
-      vx: (Math.random() - .5) * .25, vy: (Math.random() - .5) * .25,
-      a: Math.random() * .5 + .1
+      r: Math.random() * 1.6 + 0.4,
+      vx: (Math.random() - .5) * .22, vy: (Math.random() - .5) * .22,
+      a: Math.random() * .45 + .1
     }));
   }
   addEventListener('resize', resize);
@@ -533,10 +525,8 @@
       p.x += p.vx; p.y += p.vy;
       if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
       if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(255, 198, 58,' + p.a + ')';
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255, 198, 58,' + p.a + ')'; ctx.fill();
     }
     if (!reduced) requestAnimationFrame(loop);
   }
