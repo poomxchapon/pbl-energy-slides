@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ตรวจก่อนออก — Office Energy Saving | PBL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #101408;
+    --surface: rgba(255, 255, 255, 0.04);
+    --surface2: rgba(255, 255, 255, 0.07);
+    --line: rgba(255, 214, 90, 0.18);
+    --ink: #F2F0E4;
+    --muted: #9BA088;
+    --amber: #FFC63A;
+    --green: #58D6A4;
+    --red: #FF7A5C;
+    --shadow: 0 20px 60px rgba(0,0,0,.5);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; background: var(--bg); }
+  body {
+    font-family: "Noto Sans Thai", "Leelawadee UI", "Sarabun", sans-serif;
+    color: var(--ink); line-height: 1.6;
+  }
+  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+
+  #bg-canvas { position: fixed; inset: 0; z-index: 0; opacity: .5; }
+  #deck { position: relative; width: 100%; height: 100%; z-index: 1; }
+  .slide {
+    position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center;
+    padding: clamp(20px, 4.5vh, 56px) clamp(22px, 6.5vw, 100px);
+    opacity: 0; transform: translateY(14px);
+  }
+  .slide.active { display: flex; opacity: 1; transform: none; transition: opacity .4s ease, transform .4s ease; }
+
+  .kicker {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: clamp(10px, 1.2vw, 13px); letter-spacing: .2em; text-transform: uppercase;
+    color: var(--amber); font-weight: 800; margin-bottom: clamp(6px, 1.2vh, 14px);
+  }
+  .kicker::before { content: "◧"; }
+  h1 { font-size: clamp(30px, 5.4vw, 68px); font-weight: 800; line-height: 1.15; letter-spacing: -0.01em; }
+  h2 { font-size: clamp(21px, 3.2vw, 40px); font-weight: 800; line-height: 1.25; margin-bottom: clamp(10px, 2vh, 22px); text-wrap: balance; }
+  .accent { color: var(--amber); }
+  .green { color: var(--green); }
+  .red { color: var(--red); }
+  .lead { font-size: clamp(14px, 1.6vw, 21px); color: var(--muted); max-width: 62ch; }
+
+  ul.points { list-style: none; }
+  ul.points li {
+    position: relative; padding-left: 28px; font-size: clamp(13px, 1.55vw, 20px);
+    margin: clamp(5px, 1.1vh, 12px) 0;
+  }
+  ul.points li::before { content: "▸"; position: absolute; left: 4px; color: var(--amber); font-weight: 800; }
+  ul.points li strong { color: var(--amber); font-weight: 800; }
+  ul.points li em { color: var(--green); font-style: normal; font-weight: 600; }
+  ul.points.sm li { font-size: clamp(12px, 1.35vw, 17px); }
+
+  .cols { display: grid; grid-template-columns: 1.1fr .9fr; gap: clamp(16px, 2.6vw, 40px); align-items: center; min-height: 0; }
+  .cols.even { grid-template-columns: 1fr 1fr; }
+
+  figure { margin: 0; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); position: relative; box-shadow: var(--shadow); }
+  figure img { width: 100%; height: 100%; object-fit: cover; display: block; max-height: 56vh; }
+  figcaption {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(transparent, rgba(5,7,2,.94));
+    padding: 32px 14px 11px; font-size: clamp(10px, 1.15vw, 14px); line-height: 1.5;
+  }
+
+  /* stats */
+  .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(10px, 1.8vw, 24px); margin: clamp(10px, 2vh, 22px) 0; }
+  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: clamp(12px, 2vh, 22px) clamp(12px, 1.6vw, 22px); box-shadow: var(--shadow); }
+  .stat .num { font-family: "JetBrains Mono", monospace; font-variant-numeric: tabular-nums; font-size: clamp(26px, 4vw, 54px); font-weight: 700; color: var(--amber); line-height: 1.05; }
+  .stat .lab { font-size: clamp(11px, 1.2vw, 15px); color: var(--muted); margin-top: 6px; }
+  .stat-compact { display: flex; align-items: center; gap: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: clamp(7px, 1.3vh, 13px) clamp(11px, 1.5vw, 20px); }
+  .stat-compact .num { font-family: "JetBrains Mono", monospace; font-variant-numeric: tabular-nums; font-size: clamp(17px, 2.3vw, 30px); font-weight: 700; color: var(--amber); min-width: clamp(78px, 9vw, 126px); white-space: nowrap; }
+  .stat-compact .lab { font-size: clamp(10px, 1.15vw, 14px); color: var(--muted); line-height: 1.45; }
+
+  /* cause cards */
+  .cards3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(10px, 1.8vw, 22px); margin-top: clamp(8px, 1.6vh, 18px); }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: clamp(12px, 2vh, 22px); box-shadow: var(--shadow); }
+  .card .ic { font-size: clamp(20px, 2.6vw, 34px); }
+  .card b { display: block; font-size: clamp(13px, 1.6vw, 20px); margin: 6px 0 4px; color: var(--amber); }
+  .card p { font-size: clamp(11px, 1.25vw, 15px); color: var(--muted); }
+  .card .tagline { font-size: clamp(10px, 1.1vw, 13px); color: var(--green); margin-top: 8px; font-weight: 600; }
+
+  /* gap: before/after */
+  .gap-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: clamp(10px, 2vw, 26px); align-items: center; margin-top: clamp(6px, 1.4vh, 16px); }
+  .gap-box { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: clamp(12px, 2vh, 22px); }
+  .gap-box.know { border-color: rgba(88,214,164,.4); }
+  .gap-box.miss { border-color: rgba(255,122,92,.45); }
+  .gap-box h4 { font-size: clamp(13px, 1.55vw, 19px); margin-bottom: 8px; }
+  .gap-box ul { list-style: none; }
+  .gap-box li { font-size: clamp(11px, 1.25vw, 15px); color: var(--muted); margin: 5px 0; padding-left: 20px; position: relative; }
+  .gap-box.know li::before { content: "✓"; position: absolute; left: 0; color: var(--green); }
+  .gap-box.miss li::before { content: "✕"; position: absolute; left: 0; color: var(--red); }
+  .gap-arrow { font-size: clamp(20px, 3vw, 40px); color: var(--amber); }
+
+  /* flow */
+  .flow { display: flex; align-items: stretch; gap: 6px; margin-top: clamp(8px, 1.8vh, 20px); flex-wrap: wrap; }
+  .flow .step {
+    flex: 1 1 0; min-width: 110px; background: var(--surface); border: 1px solid var(--line);
+    border-top: 3px solid var(--amber); border-radius: 10px; padding: clamp(9px, 1.6vh, 16px) clamp(8px, 1vw, 14px);
+  }
+  .flow .step b { display: block; font-size: clamp(11px, 1.3vw, 16px); }
+  .flow .step span { font-size: clamp(10px, 1.05vw, 13px); color: var(--muted); }
+  .flow .step:nth-child(5) { border-top-color: var(--green); }
+
+  /* tables */
+  .tbl-wrap { overflow-x: auto; margin-top: clamp(8px, 1.6vh, 18px); }
+  table.vars { border-collapse: collapse; width: 100%; }
+  table.vars td, table.vars th { border: 1px solid var(--line); padding: clamp(5px, 1vh, 11px) clamp(9px, 1.3vw, 18px); font-size: clamp(11px, 1.3vw, 16px); text-align: left; }
+  table.vars th { color: var(--amber); font-weight: 800; background: var(--surface); font-size: clamp(10px, 1.2vw, 15px); }
+  table.vars td:first-child { color: var(--amber); font-weight: 700; }
+  table.vars td.num { font-family: "JetBrains Mono", monospace; font-variant-numeric: tabular-nums; color: var(--ink); }
+  table.vars tr.win td { background: rgba(88,214,164,.10); }
+  table.vars tr.win td:first-child { color: var(--green); }
+  table.vars tr.lose td:first-child { color: var(--red); }
+
+  .callout { border-left: 4px solid var(--green); background: rgba(88,214,164,.09); border-radius: 0 10px 10px 0; padding: clamp(9px, 1.6vh, 16px) clamp(12px, 1.6vw, 22px); margin-top: clamp(8px, 1.6vh, 18px); font-size: clamp(12px, 1.4vw, 18px); }
+  .callout.warn { border-left-color: var(--amber); background: rgba(255,198,58,.09); }
+
+  .refs { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(8px, 1.4vw, 18px); margin-top: clamp(6px, 1.2vh, 14px); }
+  .ref { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: clamp(10px, 1.7vh, 18px) clamp(11px, 1.4vw, 20px); }
+  .ref b { display: block; font-size: clamp(12px, 1.4vw, 17px); color: var(--amber); margin-bottom: 4px; }
+  .ref p { font-size: clamp(10.5px, 1.2vw, 14.5px); color: var(--muted); }
+  .ref .cite { font-size: clamp(9.5px, 1.05vw, 12.5px); color: rgba(155,160,136,.75); margin-top: 6px; font-style: italic; }
+
+  .kpi-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(10px, 1.8vw, 22px); margin-top: clamp(8px, 1.6vh, 18px); }
+  .kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: clamp(11px, 1.9vh, 20px); }
+  .kpi h4 { font-size: clamp(12px, 1.45vw, 18px); color: var(--amber); margin-bottom: 8px; }
+  .kpi li { list-style: none; font-size: clamp(10.5px, 1.2vw, 14.5px); color: var(--muted); margin: 5px 0; padding-left: 16px; position: relative; }
+  .kpi li::before { content: "•"; position: absolute; left: 2px; color: var(--amber); }
+
+  .formula { font-family: "JetBrains Mono", monospace; background: var(--surface2); border: 1px solid var(--line); border-radius: 10px; padding: clamp(9px, 1.6vh, 16px) clamp(12px, 1.6vw, 22px); font-size: clamp(11px, 1.35vw, 17px); margin-top: clamp(8px, 1.5vh, 16px); }
+
+  .src { font-size: clamp(9.5px, 1.05vw, 12.5px); color: var(--muted); margin-top: 8px; }
+  .footer-note { margin-top: clamp(10px, 2.2vh, 24px); font-size: clamp(10px, 1.15vw, 14px); color: rgba(155,160,136,.7); }
+
+  /* chrome */
+  #progress { position: fixed; top: 0; left: 0; height: 4px; background: var(--amber); z-index: 10; transition: width .3s ease; }
+  #counter { position: fixed; bottom: 16px; right: 20px; z-index: 10; font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--muted); }
+  #ver { position: fixed; bottom: 16px; left: 20px; z-index: 10; font-size: 10.5px; color: rgba(155,160,136,.6); letter-spacing: .1em; }
+  #hint { position: fixed; bottom: 38px; right: 20px; z-index: 10; font-size: 10.5px; color: rgba(155,160,136,.45); }
+  .navbtn { position: fixed; top: 50%; transform: translateY(-50%); z-index: 10; width: 40px; height: 60px; border: none; cursor: pointer; background: rgba(255,255,255,.04); color: var(--muted); font-size: 20px; border-radius: 10px; }
+  .navbtn:hover { background: rgba(255,198,58,.15); color: var(--amber); }
+  .navbtn:focus-visible, a:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+  #prev { left: 8px; } #next { right: 8px; }
+  #notes { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: rgba(10,12,5,.97); border-top: 2px solid var(--amber); padding: 14px 26px 20px; font-size: 14.5px; display: none; max-height: 38vh; overflow-y: auto; }
+  #notes.show { display: block; }
+  #notes .n-tag { color: var(--amber); font-weight: 800; font-size: 11.5px; letter-spacing: .18em; }
+
+  @media (max-width: 860px) {
+    .cols, .cols.even { grid-template-columns: 1fr; }
+    .stat-row, .cards3, .kpi-cols, .refs { grid-template-columns: 1fr; gap: 8px; }
+    .gap-grid { grid-template-columns: 1fr; }
+    .gap-arrow { transform: rotate(90deg); text-align: center; }
+    .flow { flex-direction: column; }
+    .slide { justify-content: flex-start; overflow-y: auto; padding-top: 42px; padding-bottom: 70px; }
+    .navbtn { display: none; }
+    figure img { max-height: 34vh; }
+  }
+  @media (prefers-reduced-motion: reduce) { .slide.active { transition: none; } }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div id="progress"></div>
+
+<div id="deck">
+
+<!-- ===== 0 · TITLE ===== -->
+<section class="slide" data-note="เปิดสั้น 20 วิ: 'สัปดาห์ที่แล้วเราพบว่า 75% ของพนักงานเคยลืมปิดไฟ วันนี้เราจะเสนอว่าปัญหาจริงอยู่ตรงไหน และเราเลือกแก้ตรงไหน ด้วยเหตุผลอะไร'">
+  <div class="kicker">PBL · Digital Transformation Management</div>
+  <h1>ตรวจก่อนออก<span class="accent">.</span></h1>
+  <p class="lead" style="margin-top:16px">เปลี่ยนการปิดไฟในสำนักงานจาก <span class="red">"ความจำ"</span> → เป็น <span class="green">"มาตรฐานการทำงาน"</span></p>
+  <p class="lead" style="margin-top:8px;font-size:clamp(12px,1.3vw,16px)">Office Energy Saving — from Memory to Standard Procedure</p>
+  <p class="footer-note">ภูมิ · เอมมี่ · หยก · ออย · โม &nbsp;|&nbsp; กรณีศึกษา: Innovative Village (5 บริษัท 21 คน) &nbsp;|&nbsp; 1 สิงหาคม 2569</p>
+</section>
+
+<!-- ===== 1 · PROBLEM ===== -->
+<section class="slide" data-note="ออยพูด · 'จากการสัมภาษณ์และแบบสอบถามพนักงานในสำนักงานจริง พบว่า 75% เคยลืมปิดไฟ และเกิดซ้ำในช่วงเดิม ๆ คือช่วงเปลี่ยนกิจกรรม — พักเที่ยง เข้าประชุม ออกจากพื้นที่ชั่วคราว' Key message: ลืมปิดไฟยังเกิดขึ้น แม้พนักงานตระหนักเรื่องประหยัดพลังงานแล้ว">
+  <div class="kicker">1 · Problem</div>
+  <h2>พนักงาน <span class="accent">75%</span> เคยลืมปิดไฟ</h2>
+  <div class="cols">
+    <div>
+      <ul class="points">
+        <li>เกิดซ้ำในช่วง <strong>เปลี่ยนกิจกรรม</strong> — พักเที่ยง · เข้าประชุม · ออกจากพื้นที่ชั่วคราว</li>
+        <li>พบไฟเปิดทิ้งไว้ <strong>ทั้งที่ไม่มีผู้ใช้งาน</strong> ในห้องทำงานและห้องประชุม</li>
+        <li>เป็นการใช้พลังงานที่ <strong>ไม่เกิดประโยชน์ใด ๆ</strong> ต่อองค์กร</li>
+        <li>ที่มาข้อมูล: <em>สัมภาษณ์ + แบบสอบถามพนักงานจริงใน Innovative Village</em></li>
+      </ul>
+      <div class="callout warn">พนักงาน <b>ไม่ได้ขาดความรู้</b> — ทุกคนรู้ว่าควรปิด แต่ยังลืมอยู่ดี</div>
+    </div>
+    <figure>
+      <img src="assets/audit1.webp" alt="ห้องทำงานเปิดไฟ แอร์ และพัดลมทิ้งไว้ขณะไม่มีผู้ใช้งาน">
+      <figcaption>📷 ถ่ายจริงจากสำนักงานใน Innovative Village — ไฟเพดาน แอร์ และพัดลม ทำงานพร้อมกันขณะไม่มีคนอยู่</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ===== 2 · ROOT CAUSE ===== -->
+<section class="slide" data-note="ออยพูด · 'เราถามต่อว่าทำไมถึงลืม ได้ 3 สาเหตุหลักจากปากพนักงานเอง' เน้นประโยคปิด: 'การลืมเกิดจากสถานการณ์ระหว่างเปลี่ยนกิจกรรม ไม่ใช่จากการขาดความรู้' — ห้ามใช้คำว่า ละเลย/ไม่ใส่ใจ/ขาดจิตสำนึก">
+  <div class="kicker">2 · Root Cause</div>
+  <h2>ทำไมถึงลืม — <span class="accent">3 สาเหตุจากปากพนักงาน</span></h2>
+  <div class="cards3">
+    <div class="card">
+      <div class="ic">🏃</div><b>รีบไปทำกิจกรรมถัดไป</b>
+      <p>ความสนใจย้ายไปงานถัดไปก่อนที่จะได้ตรวจสอบห้อง</p>
+      <div class="tagline">→ ข้อจำกัดด้านความจำและความสนใจ</div>
+    </div>
+    <div class="card">
+      <div class="ic">👥</div><b>คิดว่าจะมีคนมาใช้ต่อ</b>
+      <p>ไม่แน่ใจว่าตนเองเป็นคนสุดท้ายหรือไม่ จึงไม่ได้ปิด</p>
+      <div class="tagline">→ ความคาดหวังร่วมในพื้นที่ส่วนกลาง</div>
+    </div>
+    <div class="card">
+      <div class="ic">🚪</div><b>ออกจากห้องโดยไม่ตรวจสอบ</b>
+      <p>ไม่มีจังหวะหรือสิ่งกระตุ้นให้หันกลับไปดูสถานะไฟ</p>
+      <div class="tagline">→ จุดที่องค์กรเข้าไปออกแบบได้</div>
+    </div>
+  </div>
+  <div class="callout">การลืมเกิดจาก <b>สถานการณ์ระหว่างเปลี่ยนกิจกรรม</b> มากกว่าการขาดความรู้</div>
+</section>
+
+<!-- ===== 3 · GAP ANALYSIS ===== -->
+<section class="slide" data-note="ออยพูด · 'พอเทียบสิ่งที่พนักงานรู้ กับสิ่งที่องค์กรมี เราเจอช่องว่างชัดเจน' ปิดด้วย: 'ปัญหาไม่ได้อยู่ที่ไม่รู้ว่าต้องปิด แต่อยู่ที่ไม่มีระบบช่วยให้ตรวจสอบก่อนออก'">
+  <div class="kicker">3 · Gap Analysis</div>
+  <h2>ช่องว่างระหว่าง <span class="green">สิ่งที่รู้</span> กับ <span class="red">สิ่งที่มี</span></h2>
+  <div class="gap-grid">
+    <div class="gap-box know">
+      <h4 class="green">พนักงานรู้อยู่แล้ว</h4>
+      <ul>
+        <li>คนสุดท้ายควรเป็นคนปิดไฟ</li>
+        <li>การประหยัดพลังงานเป็นเรื่องสำคัญ</li>
+        <li>เปิดทิ้งไว้ทำให้ค่าไฟองค์กรสูงขึ้น</li>
+      </ul>
+    </div>
+    <div class="gap-arrow">➜</div>
+    <div class="gap-box miss">
+      <h4 class="red">แต่องค์กรยังไม่มี</h4>
+      <ul>
+        <li>มาตรฐานการตรวจสอบก่อนออกจากพื้นที่</li>
+        <li>Checklist หรือขั้นตอนที่เป็นรูปธรรม</li>
+        <li>Prompt / สิ่งเตือนในจังหวะที่ตัดสินใจ</li>
+        <li>การติดตามผลว่าทำจริงหรือไม่</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout">ปัจจุบันการปิดไฟยังอาศัย <b>ความจำของแต่ละบุคคล</b> เพียงอย่างเดียว — ซึ่งคือสาเหตุของปัญหาอยู่แล้ว</div>
+</section>
+
+<!-- ===== 4 · LITERATURE REVIEW ===== -->
+<section class="slide" data-note="หยกพูด (2-3 นาที) · ไล่ทีละงาน แล้วปิดด้วย Key message: 'การบอกให้ประหยัดไฟอย่างเดียวไม่พอ ต้องมี Trigger และ Feedback' — ถ้าอาจารย์ถามลึก ให้ยก Bicchieri อธิบายว่าทำไมคนคิดว่าจะมีคนมาใช้ต่อ">
+  <div class="kicker">4 · Literature Review</div>
+  <h2>งานวิจัยที่รองรับ <span class="accent">แนวทางที่เราเลือก</span></h2>
+  <div class="refs">
+    <div class="ref">
+      <b>Prospective Memory</b>
+      <p>คนมักลืมสิ่งที่ตั้งใจจะทำ เมื่อมีการ<em>เปลี่ยนกิจกรรม</em>หรือถูกขัดจังหวะ — ตรงกับสาเหตุที่ 1 ของเรา</p>
+      <div class="cite">Finstad et al. (2006), Applied Cognitive Psychology</div>
+    </div>
+    <div class="ref">
+      <b>Social Norms &amp; Mutual Expectations</b>
+      <p>คนตัดสินใจจากความเชื่อว่า<em>ผู้อื่นจะทำอะไร</em> จึงเกิดการคิดว่า "เดี๋ยวก็มีคนมาใช้ต่อ" — ตรงกับสาเหตุที่ 2</p>
+      <div class="cite">Bicchieri (2005), The Grammar of Society</div>
+    </div>
+    <div class="ref">
+      <b>Prompts ลดการใช้พลังงานได้จริง</b>
+      <p>การติดข้อความเตือน<em>ตรงจุดใช้งาน</em>ในสำนักงาน ช่วยให้คนปิดไฟตอนออกจากห้องมากขึ้น และข้อความเชิงความรับผิดชอบร่วมได้ผลดีกว่าคำสั่ง</p>
+      <div class="cite">Simple prompts reduce inadvertent energy consumption (2014)</div>
+    </div>
+    <div class="ref">
+      <b>Responsibility &amp; Perceived Control</b>
+      <p>พฤติกรรมประหยัดพลังงานในพื้นที่ส่วนรวมสัมพันธ์กับ<em>ความชัดเจนของความรับผิดชอบ</em>และความสะดวกในการควบคุมอุปกรณ์</p>
+      <div class="cite">Frontiers in Built Environment (2020) · Frontiers in Psychology (2025, บริบทไทย)</div>
+    </div>
+  </div>
+  <div class="callout">การบอกให้ประหยัดไฟอย่างเดียว <b>ไม่เพียงพอ</b> — ต้องมี <b>Trigger</b> (สิ่งกระตุ้นถูกที่ถูกเวลา) และ <b>Feedback</b></div>
+</section>
+
+<!-- ===== 5 · PROPOSED SOLUTION ===== -->
+<section class="slide" data-note="โมพูด · เหตุผลของการเลือก: 'สาเหตุที่ 1 กับ 2 เป็นพฤติกรรมส่วนบุคคล คุมยาก ส่วนการติดเซนเซอร์มีต้นทุนและยังพิสูจน์ความคุ้มค่าไม่ได้ เราจึงเลือกแก้ที่สาเหตุที่ 3 ซึ่งองค์กรสร้างมาตรฐานร่วมกันได้' — ถ้าอาจารย์ถามว่าทำไมไม่ทำเกม ตอบ: เพราะ root cause คือการลืมตรวจสอบ ไม่ใช่การขาดแรงจูงใจ">
+  <div class="kicker">5 · Proposed Solution</div>
+  <h2>เลือกแก้ที่ <span class="accent">"ไม่ได้ตรวจสอบก่อนออก"</span></h2>
+  <div class="cols">
+    <div>
+      <div class="tbl-wrap">
+        <table class="vars">
+          <tr><th>สาเหตุ</th><th>ประเมิน</th></tr>
+          <tr class="lose"><td>รีบไปทำกิจกรรมอื่น</td><td>พฤติกรรมส่วนบุคคล — ควบคุมได้ยาก</td></tr>
+          <tr class="lose"><td>คิดว่าจะมีคนมาใช้ต่อ</td><td>ความเชื่อส่วนบุคคล — เปลี่ยนได้ช้า</td></tr>
+          <tr class="win"><td>ไม่ได้ตรวจสอบก่อนออก</td><td><b>องค์กรสร้างมาตรฐานร่วมกันได้ทันที</b></td></tr>
+        </table>
+      </div>
+      <div class="callout">เปลี่ยนการปิดไฟจาก <b class="red">"ความจำ"</b> → เป็น <b class="green">"มาตรฐานการทำงาน"</b></div>
+      <p class="src">หมายเหตุ: เซนเซอร์/ระบบปิดอัตโนมัติยังไม่ตัดทิ้ง แต่จัดเป็นระยะถัดไป เนื่องจากมีต้นทุนและต้องพิสูจน์ความคุ้มค่าก่อน (ดูสไลด์ 8)</p>
+    </div>
+    <figure>
+      <img src="assets/sol_sign.webp" alt="ป้ายเตือนเล็ก ๆ ติดข้างมือจับประตูและสวิตช์ไฟ ตำแหน่งที่ตัดสินใจก่อนออกจากห้อง">
+      <figcaption>Trigger วางไว้ ณ จุดตัดสินใจ — ข้างมือจับประตูและสวิตช์ไฟ ก่อนก้าวออกจากห้อง</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ===== 6 · SOLUTION DESIGN ===== -->
+<section class="slide" data-note="โมพูด · ไล่ 4 องค์ประกอบแล้วเดิน workflow ทีละขั้น เน้นว่าขั้น 'ยืนยัน' คือสิ่งที่ทำให้วัดผลได้ ไม่ใช่แค่ติดป้ายแล้วจบ · ถ้อยคำบนป้ายต้องเป็นการกระตุ้น ไม่ใช่การตำหนิ">
+  <div class="kicker">6 · Solution Design</div>
+  <h2>องค์ประกอบ + <span class="accent">ขั้นตอนการทำงาน</span></h2>
+  <div class="cards3" style="grid-template-columns:repeat(4,1fr)">
+    <div class="card"><div class="ic">📋</div><b>Standard</b><p>กำหนดชัดว่าใครตรวจ ตรวจอะไร ตรวจเมื่อไร</p></div>
+    <div class="card"><div class="ic">🔔</div><b>Prompt</b><p>ป้ายเตือนที่ประตู/สวิตช์ — ถ้อยคำกระตุ้น ไม่ตำหนิ</p></div>
+    <div class="card"><div class="ic">✅</div><b>Checklist / QR</b><p>สแกนยืนยันการตรวจ ใช้เวลา 5 วินาที</p></div>
+    <div class="card"><div class="ic">📊</div><b>Feedback</b><p>สรุปผลรายสัปดาห์ให้ทีมเห็นร่วมกัน</p></div>
+  </div>
+  <div class="flow">
+    <div class="step"><b>1 · ก่อนออก</b><span>ป้ายเตือนสะดุดตาที่จุดตัดสินใจ</span></div>
+    <div class="step"><b>2 · ตรวจ</b><span>มีคนอยู่ในห้องหรือไม่</span></div>
+    <div class="step"><b>3 · ปิด</b><span>ไฟ · แอร์ · อุปกรณ์ที่ไม่ใช้</span></div>
+    <div class="step"><b>4 · ยืนยัน</b><span>สแกน QR / ติ๊ก checklist</span></div>
+    <div class="step"><b>5 · สรุปผล</b><span>Feedback กลับไปที่ทีม</span></div>
+  </div>
+  <div class="callout">ข้อความบนป้ายเป็นการ <b>กระตุ้นให้ตรวจสอบ</b> เช่น "เป็นคนสุดท้ายหรือไม่ ตรวจไฟก่อนออก" — ไม่ใช้ถ้อยคำตำหนิ เพราะไม่ได้แก้สาเหตุด้านความจำ</div>
+</section>
+
+<!-- ===== 7 · EVALUATION ===== -->
+<section class="slide" data-note="เอมมี่พูด · 'เราวัด 3 ด้าน โดยด้านพฤติกรรมเป็นตัวชี้ขาด เพราะหน่วยไฟรวมถูกอากาศและจำนวนคนรบกวน' · ย้ำว่าต้องเก็บ baseline ก่อน 2-4 สัปดาห์ ถึงจะเทียบก่อน-หลังได้">
+  <div class="kicker">7 · Evaluation</div>
+  <h2>วัดผลอย่างไร — <span class="accent">3 ด้าน</span></h2>
+  <div class="kpi-cols">
+    <div class="kpi">
+      <h4>① ด้านพฤติกรรม <span class="green">(ตัวชี้ขาด)</span></h4>
+      <li>อัตราการตรวจสอบก่อนออก (%)</li>
+      <li>จำนวนครั้งที่พบไฟเปิดทิ้ง/สัปดาห์</li>
+      <li>อัตราการทำ Checklist ครบ</li>
+    </div>
+    <div class="kpi">
+      <h4>② ด้านพลังงาน</h4>
+      <li>ชั่วโมงที่ไฟเปิดโดยไม่มีคนอยู่</li>
+      <li>หน่วยไฟฟ้า (kWh) ที่ลดลง</li>
+      <li>ค่าไฟที่ประหยัดได้ (บาท)</li>
+    </div>
+    <div class="kpi">
+      <h4>③ ด้านเศรษฐศาสตร์</h4>
+      <li>ต้นทุนรวมของมาตรการ</li>
+      <li>ROI</li>
+      <li>ระยะเวลาคืนทุน</li>
+    </div>
+  </div>
+  <div class="callout warn">ให้ <b>ตัวชี้วัดด้านพฤติกรรม</b> เป็นตัวชี้ขาด เพราะหน่วยไฟรวมถูกรบกวนด้วยสภาพอากาศและจำนวนคนเข้าออฟฟิศ — ต้องเก็บ <b>Baseline 2–4 สัปดาห์</b> ก่อนเริ่มมาตรการ</div>
+</section>
+
+<!-- ===== 8 · COST-EFFECTIVENESS ===== -->
+<section class="slide" data-note="เอมมี่พูด — สไลด์ตอบอาจารย์โดยตรง! · 'อาจารย์ให้ไปดูว่าเปิดไฟทิ้งมีค่าใช้จ่ายเท่าไรเทียบกับต้นทุนติดตั้ง เราคำนวณแล้วพบว่า ถ้าคิดเฉพาะไฟส่องสว่าง การติดเซนเซอร์คืนทุนนานถึง ~5 ปี แต่มาตรการป้ายเตือน+checklist คืนทุนภายในเดือนเดียว นี่คือเหตุผลเชิงตัวเลขที่เราเลือกทางนี้ก่อน' ⚠️ ย้ำว่าเป็นตัวเลขประมาณการ รอแทนด้วยบิลจริงที่เก็บมาแล้ว">
+  <div class="kicker">8 · Cost-effectiveness</div>
+  <h2>คุ้มไหม — <span class="accent">คำนวณแล้วจึงเลือก</span></h2>
+  <div class="tbl-wrap">
+    <table class="vars">
+      <tr><th>แนวทาง</th><th>ต้นทุน/ห้อง</th><th>ประหยัด/เดือน/ห้อง</th><th>ระยะคืนทุน</th></tr>
+      <tr class="win"><td>ป้ายเตือน + Checklist</td><td class="num">~50–200 ฿</td><td class="num">~19–225 ฿</td><td class="num green">&lt; 1 เดือน ✓</td></tr>
+      <tr class="lose"><td>เซนเซอร์ (คิดเฉพาะไฟ)</td><td class="num">~1,500 ฿</td><td class="num">~19 ฿</td><td class="num red">~5–6 ปี ✕</td></tr>
+      <tr><td>เซนเซอร์ (ไฟ + แอร์)</td><td class="num">~1,500 ฿</td><td class="num">~225 ฿</td><td class="num">~7 เดือน</td></tr>
+    </table>
+  </div>
+  <div class="formula">ระยะเวลาคืนทุน = ต้นทุนของ Solution ÷ เงินที่ประหยัดได้ต่อเดือน &nbsp;|&nbsp; ค่าไฟ 3.95 ฿/หน่วย (กกพ. งวด พ.ค.–ส.ค. 69)</div>
+  <div class="callout">ตัวเลขยืนยันว่ามาตรการ <b>ต้นทุนต่ำควรมาก่อน</b> — ไม่ได้เลือกเพราะทำง่าย แต่เลือกเพราะคำนวณแล้วคุ้มกว่าในระยะแรก</div>
+  <p class="src">⚠️ ตัวเลขข้างต้นเป็นการประมาณการเบื้องต้น (สมมติ LED 6 หลอด/ห้อง เปิดทิ้ง 2 ชม./วัน × 22 วัน) — อยู่ระหว่างแทนค่าด้วยบิลค่าไฟจริงของทั้ง 5 บริษัทที่เก็บมาแล้ว</p>
+</section>
+
+<!-- ===== 9 · ENERGY DATA COLLECTION ===== -->
+<section class="slide" data-note="ออยพูด · 'ข้อมูลชุดนี้คือ baseline ที่จำเป็นก่อนจะบอกได้ว่ามาตรการได้ผลจริงไหม เราเริ่มเก็บบิลค่าไฟจากบริษัทในพื้นที่แล้ว' · ระบุว่าเก็บครบ 5 บริษัท 21 คน">
+  <div class="kicker">9 · Energy Data Collection</div>
+  <h2>ข้อมูลพื้นฐานที่ต้องเก็บ <span class="accent">ก่อนวัดผล</span></h2>
+  <div class="cols">
+    <div>
+      <ul class="points sm">
+        <li><strong>ค่าไฟย้อนหลัง</strong> ของแต่ละบริษัท (เก็บแล้ว)</li>
+        <li><strong>จำนวนหลอดไฟ</strong> และกำลังไฟแต่ละพื้นที่</li>
+        <li><strong>จำนวนเครื่องปรับอากาศ</strong> และชั่วโมงใช้งาน</li>
+        <li><strong>จำนวนพนักงาน</strong> และพื้นที่สำนักงาน</li>
+      </ul>
+      <div class="tbl-wrap">
+        <table class="vars">
+          <tr><th>บริษัท</th><th>อาคาร</th><th>พนักงาน</th></tr>
+          <tr><td>CAS Cogniser</td><td>B3, B4</td><td class="num">4</td></tr>
+          <tr><td>Innergylab</td><td>B6</td><td class="num">4</td></tr>
+          <tr><td>Innovative Village</td><td>A1</td><td class="num">4</td></tr>
+          <tr><td>IAgency</td><td>C10</td><td class="num">3</td></tr>
+          <tr><td>Kiry</td><td>B5</td><td class="num">6</td></tr>
+        </table>
+      </div>
+    </div>
+    <figure>
+      <img src="assets/iv_map.webp" alt="แผนที่ Innovative Village แสดงตำแหน่งอาคารของ 5 บริษัทกลุ่มเป้าหมาย">
+      <figcaption>พื้นที่ศึกษา: Innovative Village — 5 บริษัท 21 คน กระจายตามอาคาร A1 / B3–B6 / C10</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ===== 10 · EXPECTED OUTCOME ===== -->
+<section class="slide" data-note="เอมมี่พูดปิด · 'สิ่งที่เราคาดหวังไม่ใช่แค่ค่าไฟลด แต่คือองค์กรมีมาตรฐานที่ทำซ้ำได้ และมีข้อมูลพอที่จะตัดสินใจเรื่องเซนเซอร์ในระยะถัดไป' ปิดท้าย: 'ถ้าผลออกมาว่ามาตรการไม่ได้ผล เราก็จะรู้ด้วยข้อมูลจริง ไม่ใช่การเดา — ขอบคุณครับ/ค่ะ'">
+  <div class="kicker">10 · Expected Outcome</div>
+  <h2>ผลลัพธ์ที่คาดหวัง</h2>
+  <div class="cols">
+    <div>
+      <ul class="points">
+        <li>สำนักงานมี <strong>มาตรฐานการตรวจสอบก่อนออก</strong> ที่ทำซ้ำได้และวัดผลได้</li>
+        <li><strong>จำนวนครั้งที่พบไฟเปิดทิ้งลดลง</strong> เทียบกับช่วง Baseline</li>
+        <li>ได้ <strong>ข้อมูลการใช้พลังงานจริง</strong> ที่องค์กรไม่เคยมีมาก่อน</li>
+        <li>มีฐานตัวเลขพอสำหรับตัดสินใจว่า <em>ควรลงทุนเซนเซอร์ในระยะถัดไปหรือไม่</em></li>
+      </ul>
+      <div class="callout">ต่อให้ผลออกมาว่ามาตรการยังไม่พอ งานนี้ก็สำเร็จเชิงระเบียบวิธี — เพราะจะรู้ด้วย <b>ข้อมูลจริง</b> ไม่ใช่การเดา</div>
+    </div>
+    <figure>
+      <img src="assets/sol_outcome.webp" alt="สำนักงานหลังเลิกงานที่ปิดไฟและอุปกรณ์เรียบร้อย">
+      <figcaption>ภาพเป้าหมาย: ห้องว่าง = ไฟดับ โดยไม่ต้องพึ่งความจำของใครคนใดคนหนึ่ง</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ===== 11 · Q&A ===== -->
+<section class="slide" data-note="สไลด์สำรอง เปิดเฉพาะตอนโดนถาม">
+  <div class="kicker">Appendix · เตรียมตอบคำถาม</div>
+  <h2>Q&amp;A</h2>
+  <ul class="points sm">
+    <li><strong>ทำไมไม่ติดเซนเซอร์เลย?</strong> — คำนวณแล้ว: ถ้าคิดเฉพาะไฟส่องสว่าง คืนทุน ~5 ปี · และมีความเสี่ยงตัดไฟขณะพนักงานนั่งนิ่ง ๆ · จัดเป็นระยะถัดไปหลังมีข้อมูล baseline</li>
+    <li><strong>ทำไมไม่ทำ Gamification?</strong> — Root cause คือ<em>การลืมตรวจสอบ</em> ไม่ใช่การขาดแรงจูงใจ · แรงจูงใจแก้ปัญหาความจำไม่ได้โดยตรง</li>
+    <li><strong>ป้ายเตือนอย่างเดียวจะพอเหรอ?</strong> — ไม่ได้มีแค่ป้าย มี Standard + Checklist ยืนยัน + Feedback · และมีงานวิจัยรองรับว่า prompt ตรงจุดใช้งานลดการเปิดไฟทิ้งได้จริง</li>
+    <li><strong>วัดผลยังไงให้เชื่อถือได้?</strong> — Baseline 2–4 สัปดาห์ก่อนเริ่ม แล้วเทียบก่อน–หลังด้วยวิธีเก็บเดิมเป๊ะ · ใช้ตัวชี้วัดพฤติกรรมเป็นหลักเพราะ kWh ถูกอากาศรบกวน</li>
+    <li><strong>ข้อมูลสัมภาษณ์น้อยไปไหม?</strong> — ยอมรับเป็นข้อจำกัด (ผู้ให้ข้อมูล 3 คน + แบบสอบถาม) จึงต้องใช้ร่วมกับการสังเกตและการตรวจวัดจริง</li>
+  </ul>
+</section>
+
+</div>
+
+<button class="navbtn" id="prev" aria-label="สไลด์ก่อนหน้า">‹</button>
+<button class="navbtn" id="next" aria-label="สไลด์ถัดไป">›</button>
+<div id="counter">1 / 12</div>
+<div id="hint">← → เปลี่ยนสไลด์ · N = โน้ตผู้พูด · F = เต็มจอ</div>
+<div id="ver">PBL-SLIDES v0.2.0</div>
+<div id="notes"><span class="n-tag">SPEAKER NOTES</span><p id="note-text"></p></div>
+
+<script>
+(function () {
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const progress = document.getElementById('progress');
+  const counter = document.getElementById('counter');
+  const notes = document.getElementById('notes');
+  const noteText = document.getElementById('note-text');
+  let idx = Math.min(parseInt(location.hash.slice(1), 10) - 1 || 0, slides.length - 1);
+  if (idx < 0) idx = 0;
+
+  const counted = new Set();
+  function animateCounters(slide) {
+    slide.querySelectorAll('[data-count]').forEach(el => {
+      if (counted.has(el)) return;
+      counted.add(el);
+      const target = parseInt(el.dataset.count, 10);
+      const suffix = el.dataset.suffix || '';
+      const t0 = performance.now(), dur = 1000;
+      function tick(t) {
+        const p = Math.min((t - t0) / dur, 1);
+        el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3))) + suffix;
+        if (p < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    });
+  }
+
+  function show(i) {
+    idx = Math.max(0, Math.min(i, slides.length - 1));
+    slides.forEach((s, n) => s.classList.toggle('active', n === idx));
+    progress.style.width = ((idx + 1) / slides.length * 100) + '%';
+    counter.textContent = (idx + 1) + ' / ' + slides.length;
+    noteText.textContent = slides[idx].dataset.note || '';
+    location.hash = idx + 1;
+    animateCounters(slides[idx]);
+  }
+
+  document.getElementById('next').onclick = () => show(idx + 1);
+  document.getElementById('prev').onclick = () => show(idx - 1);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') show(idx + 1);
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') show(idx - 1);
+    else if (e.key.toLowerCase() === 'n') notes.classList.toggle('show');
+    else if (e.key.toLowerCase() === 'f') {
+      document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+    }
+  });
+
+  let touchX = null;
+  document.addEventListener('touchstart', e => touchX = e.touches[0].clientX, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 50) show(idx + (dx < 0 ? 1 : -1));
+    touchX = null;
+  }, { passive: true });
+
+  show(idx);
+
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cv = document.getElementById('bg-canvas');
+  const ctx = cv.getContext('2d');
+  let W, H, parts = [];
+  function resize() {
+    W = cv.width = innerWidth; H = cv.height = innerHeight;
+    parts = Array.from({ length: Math.min(60, W / 22) }, () => ({
+      x: Math.random() * W, y: Math.random() * H,
+      r: Math.random() * 1.6 + 0.4,
+      vx: (Math.random() - .5) * .22, vy: (Math.random() - .5) * .22,
+      a: Math.random() * .45 + .1
+    }));
+  }
+  addEventListener('resize', resize);
+  resize();
+  function loop() {
+    ctx.clearRect(0, 0, W, H);
+    for (const p of parts) {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255, 198, 58,' + p.a + ')'; ctx.fill();
+    }
+    if (!reduced) requestAnimationFrame(loop);
+  }
+  loop();
+})();
+</script>
+</body>
+</html>
