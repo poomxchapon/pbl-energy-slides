@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ผลการเก็บข้อมูลรายบ้าน : ป้ายเตือนกับการประหยัดไฟ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink0:#070C16; --ink1:#0B1220; --ink2:#111A2C; --ink3:#182338;
+    --surface:rgba(255,255,255,.045); --surface2:rgba(255,255,255,.08);
+    --line:rgba(255,176,32,.18); --line2:rgba(255,255,255,.10);
+    --fg:#EDF1F7; --muted:#8FA0B8; --faint:rgba(143,160,184,.6);
+    --amber:#FFB020; --mint:#3ED598; --coral:#FF6B6B; --sky:#6AA9FF;
+    --r:14px; --rs:9px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{color-scheme:dark}
+  body{font-family:"Noto Sans Thai","Leelawadee UI","Sarabun",sans-serif;color:var(--fg);line-height:1.6;background:
+    radial-gradient(1100px 600px at 90% -10%,rgba(255,176,32,.07),transparent 60%),
+    radial-gradient(900px 560px at -10% 100%,rgba(62,213,152,.05),transparent 58%),
+    linear-gradient(180deg,var(--ink1),var(--ink0) 60%);min-height:100vh}
+  .mono{font-family:"JetBrains Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+  a{color:var(--sky)}
+  .wrap{max-width:1180px;margin:0 auto;padding:18px clamp(14px,3vw,32px) 80px}
+
+  header{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:flex-end;justify-content:space-between;padding:8px 0 16px;border-bottom:1px solid var(--line2);margin-bottom:18px}
+  .kick{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);font-weight:800;display:flex;align-items:center;gap:9px}
+  .kick::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 10px var(--amber)}
+  h1{font-size:clamp(20px,3vw,30px);font-weight:800;line-height:1.25;margin-top:4px}
+  h1 .am{color:var(--amber)}
+  .src{display:flex;flex-wrap:wrap;gap:8px}
+  .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line2);background:var(--surface);color:var(--fg);padding:7px 12px;border-radius:999px;font-size:12.5px;font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap;transition:.15s}
+  .btn:hover{border-color:var(--amber);background:rgba(255,176,32,.1);color:var(--amber)}
+  .btn.sm{padding:4px 9px;font-size:11.5px}
+  .btn.mi{border-color:rgba(62,213,152,.35);color:var(--mint)} .btn.mi:hover{background:rgba(62,213,152,.12)}
+
+  /* verdict */
+  .verd{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+  .card{background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--line2);border-radius:var(--r);padding:16px 18px;position:relative}
+  .card::before{content:"";position:absolute;top:-1px;left:16px;right:16px;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--amber),transparent);opacity:.55}
+  .card.ok::before{background:linear-gradient(90deg,transparent,var(--mint),transparent)}
+  .card.no::before{background:linear-gradient(90deg,transparent,var(--coral),transparent)}
+  .card h3{font-size:12px;letter-spacing:.08em;color:var(--muted);font-weight:700;text-transform:uppercase}
+  .card .big{font-family:"JetBrains Mono",monospace;font-size:clamp(24px,3.6vw,38px);font-weight:700;line-height:1.1;margin:6px 0 2px}
+  .card .big .arr{color:var(--muted);font-size:.6em;margin:0 8px}
+  .card .sub{font-size:13px;color:var(--muted)}
+  .tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;padding:3px 10px;border-radius:999px;margin-top:8px}
+  .tag.ok{background:rgba(62,213,152,.14);color:var(--mint);border:1px solid rgba(62,213,152,.4)}
+  .tag.no{background:rgba(255,107,107,.14);color:var(--coral);border:1px solid rgba(255,107,107,.4)}
+  .how{margin-top:10px;border-top:1px dashed var(--line2);padding-top:10px;display:none}
+  .how.on{display:block}
+  .how ol{padding-left:20px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+  .how li b{color:var(--fg)} .how li .mono{color:var(--amber)}
+  .how .hlb{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}
+
+  /* tabs */
+  .tabs{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 14px;position:sticky;top:0;z-index:5;padding:10px 0;background:linear-gradient(180deg,var(--ink1) 70%,transparent)}
+  .tab{border:1px solid var(--line2);background:var(--surface);color:var(--muted);padding:8px 14px;border-radius:999px;font-weight:700;font-size:13.5px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:.15s}
+  .tab:hover{color:var(--fg);border-color:var(--amber)}
+  .tab.on{background:rgba(255,176,32,.16);color:var(--amber);border-color:var(--amber)}
+  .tab .n{font-family:"JetBrains Mono",monospace;font-size:11px;background:rgba(0,0,0,.35);padding:1px 7px;border-radius:999px;color:var(--fg)}
+  .tab .n.hot{background:var(--coral);color:#fff}
+
+  /* overview grid */
+  .ov{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+  .hc{cursor:pointer;transition:.15s} .hc:hover{transform:translateY(-2px);border-color:var(--amber)}
+  .hc h4{font-size:17px;font-weight:800;display:flex;justify-content:space-between;align-items:center}
+  .hc h4 small{font-size:11px;color:var(--muted);font-weight:600}
+  .strip{display:grid;grid-template-columns:repeat(15,1fr);gap:3px;margin:10px 0 8px}
+  .strip i{height:16px;border-radius:3px;background:rgba(255,255,255,.07);position:relative}
+  .strip i.forget{background:var(--coral)} .strip i.ok{background:var(--mint)} .strip i.occ{background:rgba(143,160,184,.35)}
+  .strip i.bl::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:2px;background:rgba(255,176,32,.5)}
+  .kv{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;font-size:12.5px;color:var(--muted)}
+  .kv b{color:var(--fg);font-family:"JetBrains Mono",monospace;font-weight:600}
+  .legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted);margin:4px 0 14px}
+  .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:5px}
+
+  /* house summary */
+  .hsum{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+  .stat{background:var(--surface);border:1px solid var(--line2);border-radius:var(--rs);padding:10px 12px}
+  .stat .l{font-size:11.5px;color:var(--muted)} .stat .v{font-family:"JetBrains Mono",monospace;font-size:20px;font-weight:700;color:var(--amber);line-height:1.2}
+  .stat .v.mi{color:var(--mint)} .stat .v.co{color:var(--coral)} .stat .v.mu{color:var(--muted);font-size:15px}
+  .stat .s{font-size:11px;color:var(--faint)}
+  .stat.click{cursor:pointer} .stat.click:hover{border-color:var(--amber)}
+
+  .filters{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0 10px;font-size:12.5px;color:var(--muted)}
+  .chip{border:1px solid var(--line2);background:var(--surface);color:var(--muted);padding:4px 10px;border-radius:999px;font-size:12px;cursor:pointer;font-weight:600}
+  .chip.on{border-color:var(--amber);color:var(--amber);background:rgba(255,176,32,.12)}
+
+  /* day rows */
+  .days{display:flex;flex-direction:column;gap:8px}
+  .ph{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:800;margin:10px 0 2px;display:flex;align-items:center;gap:10px}
+  .ph::after{content:"";flex:1;height:1px;background:var(--line2)}
+  .ph.iv{color:var(--amber)}
+  .day{background:var(--surface);border:1px solid var(--line2);border-radius:var(--r);overflow:hidden;transition:border-color .15s}
+  .day.hl{border-color:var(--amber);box-shadow:0 0 0 2px rgba(255,176,32,.25)}
+  .day.dim{opacity:.35}
+  .row{display:grid;grid-template-columns:118px 1.35fr .9fr 1.05fr 1fr;gap:10px;padding:11px 14px;align-items:center;cursor:pointer}
+  .row:hover{background:rgba(255,255,255,.03)}
+  .d{line-height:1.2} .d b{font-size:15px;display:block} .d span{font-size:11px;color:var(--muted)}
+  .d .pb{display:inline-block;margin-top:4px;font-size:10px;font-weight:800;padding:1px 7px;border-radius:999px;background:rgba(143,160,184,.18);color:var(--muted);letter-spacing:.06em}
+  .d .pb.iv{background:rgba(255,176,32,.16);color:var(--amber)}
+  .lab{font-size:10.5px;color:var(--faint);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:3px}
+  .c{display:inline-flex;align-items:center;gap:4px;font-size:12px;padding:2px 8px;border-radius:6px;background:rgba(255,255,255,.06);color:var(--muted);white-space:nowrap}
+  .c.on{background:rgba(255,176,32,.14);color:var(--amber)} .c.off{background:rgba(62,213,152,.12);color:var(--mint)} .c.emp{background:rgba(106,169,255,.14);color:var(--sky)}
+  .chips{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+  .res{font-weight:800;font-size:13px;padding:3px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:5px}
+  .res.forget{background:rgba(255,107,107,.16);color:var(--coral);border:1px solid rgba(255,107,107,.45)}
+  .res.ok{background:rgba(62,213,152,.14);color:var(--mint);border:1px solid rgba(62,213,152,.4)}
+  .res.occ{background:rgba(143,160,184,.14);color:var(--muted);border:1px solid var(--line2)}
+  .res.none{color:var(--faint);font-weight:600}
+  .kwh{line-height:1.25} .kwh b{font-family:"JetBrains Mono",monospace;font-size:20px;font-weight:700;color:var(--amber)} .kwh b.low{color:var(--coral)}
+  .kwh small{display:block;font-size:11px;color:var(--muted);font-family:"JetBrains Mono",monospace}
+  .flags{display:flex;flex-direction:column;gap:3px;font-size:11.5px}
+  .flag{color:var(--coral);font-weight:700} .flag.w{color:var(--amber)}
+  .ev{display:flex;flex-wrap:wrap;gap:5px;justify-self:end}
+  .det{display:none;border-top:1px solid var(--line2);background:rgba(0,0,0,.25);padding:12px 14px 14px;font-size:12.5px}
+  .day.open .det{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .det h5{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);margin-bottom:6px}
+  .det table{border-collapse:collapse;width:100%} .det td{padding:3px 6px;border-bottom:1px solid var(--line2);vertical-align:top;color:var(--muted)}
+  .det td:first-child{color:var(--faint);white-space:nowrap;width:120px} .det td.v{color:var(--fg)}
+  .det .links{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}
+  .note{color:var(--muted);font-size:12px;line-height:1.5;word-break:break-word}
+  .empty{padding:24px;text-align:center;color:var(--muted);border:1px dashed var(--line2);border-radius:var(--r)}
+  .foot{margin-top:28px;font-size:11.5px;color:var(--faint);display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:space-between}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink3);border:1px solid var(--amber);color:var(--fg);padding:10px 16px;border-radius:999px;font-size:13px;z-index:20;display:none;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+  .toast.on{display:flex;gap:10px;align-items:center}
+  .toast button{background:none;border:none;color:var(--amber);font-weight:800;cursor:pointer;font-family:inherit}
+
+  @media (max-width:900px){
+    .verd{grid-template-columns:1fr}
+    .row{grid-template-columns:1fr 1fr;gap:8px}
+    .row .d{grid-column:1/-1;display:flex;gap:10px;align-items:baseline} .row .d .pb{margin:0}
+    .ev{grid-column:1/-1;justify-self:start}
+    .day.open .det{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <div class="kick">ผลการเก็บข้อมูลภาคสนาม · กลุ่มที่ 2</div>
+    <h1>แต่ละบ้าน <span class="am">แต่ละวัน</span> เกิดอะไรขึ้น</h1>
+    <div class="sub" style="color:var(--muted);font-size:13px;margin-top:4px">Baseline 24–28 ส.ค. (ยังไม่ติดป้าย) · ติดป้าย 31 ส.ค.–11 ก.ย. 2569 · ทุกตัวเลขคำนวณสดจากแถวใน Log และกดย้อนไปดูหลักฐานได้</div>
+  </div>
+  <div class="src">
+    <a class="btn" id="lnkSheet" target="_blank" rel="noopener">📊 เปิด Google Sheet ต้นทาง</a>
+    <a class="btn" id="lnkDrive" target="_blank" rel="noopener">📁 โฟลเดอร์รูปพฤติกรรม</a>
+  </div>
+</header>
+
+<div class="verd" id="verd"></div>
+
+<div class="tabs" id="tabs"></div>
+<div id="view"></div>
+
+<div class="foot">
+  <span>ข้อมูลจาก แบบเก็บข้อมูลสำหรับสำรวจ - Update.xlsx (ดาวน์โหลด 15 ก.ย. 2569) · แถวที่อ้างอิงคือเลขแถวจริงในชีต · ค่ามิเตอร์อ่านจากรูปโดย Luna Agent ยังไม่ผ่านการตรวจโดยคน</span>
+  <span class="mono" id="ver">RESULTS v1.0.0</span>
+</div>
+</div>
+<div class="toast" id="toast"><span id="toastTx"></span><button id="toastX">ยกเลิกไฮไลท์ ✕</button></div>
+
+<script src="data.js"></script>
+<script>
+(function(){
+const SHEET='https://docs.google.com/spreadsheets/d/1btrHT6Ne4auehJh8befvRlmtH-NlA4n3uGIaTvOflOM';
+const GID={beh:1389238249,met:968491910,dash:1877400029};
+const OFFICES=[['CAS-B4','บ้านที่ 1 · 4 คน'],['INN-B6','บ้านที่ 2 · 4 คน · มิเตอร์กลไก'],['IV-B1','บ้านที่ 3 · 5 คน'],['IA-C13','บ้านที่ 4 · 4 คน'],['KIRY-B5','บ้านที่ 5 · 4 คน']];
+const DATES=[...new Set(DATA.met.map(m=>m.date))].sort();
+const isBL=d=>d<'2026-08-31';
+const TH=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const DOW=['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
+const fdate=d=>{const [y,m,dd]=d.split('-').map(Number);const dt=new Date(y,m-1,dd);return `${DOW[dt.getDay()]} ${dd} ${TH[m-1]}`};
+const sheetLink=(k,row)=>`${SHEET}/edit#gid=${GID[k]}&range=A${row}:N${row}`;
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- build per office/day records ---------- */
+const res12=b=>!b?null:(b.occ==='ห้องว่าง'?((b.light==='เปิด'||b.ac==='เปิด')?'forget':'ok'):'occ');
+const H={};
+for(const [o] of OFFICES){
+  H[o]={office:o,days:[]};
+  for(const d of DATES){
+    const met=DATA.met.find(m=>m.office===o&&m.date===d)||null;
+    const b12=DATA.beh.find(b=>b.office===o&&b.date===d&&b.round.includes('12.15'))||null;
+    const rnd=DATA.beh.filter(b=>b.office===o&&b.date===d&&b.round.includes('สุ่ม'));
+    const flags=[];
+    if(met&&/ควรตรวจ/.test(met.note||''))flags.push({t:'w',x:'ผู้อ่านมิเตอร์บันทึกว่าควรตรวจซ้ำ'});
+    if(met&&b12&&b12.ac==='เปิด'&&met.kwh<=0.3)flags.push({t:'e',x:`แอร์เปิดตอน 12.15 แต่มิเตอร์อ่านได้ ${met.kwh.toFixed(2)} kWh (เป็นไปได้ยาก)`});
+    if(met&&met.temp==null)flags.push({t:'w',x:'ไม่มีค่าอุณหภูมิ'});
+    H[o].days.push({date:d,bl:isBL(d),met,b12,rnd,r12:res12(b12),rr:rnd.map(res12),flags});
+  }
+}
+/* ---------- calculations (Forget Rate นับทุกรอบที่ห้องว่าง) ---------- */
+function frStats(list){ // list of beh rows
+  const empty=list.filter(b=>b.occ==='ห้องว่าง'); const forget=empty.filter(b=>res12(b)==='forget');
+  return {n:list.length,empty:empty.length,forget:forget.length,fr:empty.length?forget.length/empty.length*100:null,rows:{empty,forget}};
+}
+function kwhStats(list){const v=list.map(m=>m.kwh);return {n:v.length,mean:v.length?v.reduce((a,b)=>a+b,0)/v.length:null,sum:v.reduce((a,b)=>a+b,0)}}
+function summary(office){
+  const bf=b=>(!office||b.office===office); const mf=m=>(!office||m.office===office);
+  const B=DATA.beh.filter(b=>bf(b)&&b.phase==='Baseline'),I=DATA.beh.filter(b=>bf(b)&&b.phase==='Intervention');
+  const MB=DATA.met.filter(m=>mf(m)&&m.phase==='Baseline'),MI=DATA.met.filter(m=>mf(m)&&m.phase==='Intervention');
+  const fB=frStats(B),fI=frStats(I),kB=kwhStats(MB),kI=kwhStats(MI);
+  const esr=(kB.mean!=null&&kI.mean!=null)?(kB.mean-kI.mean)/kB.mean*100:null;
+  const warn=DATA.met.filter(m=>mf(m)&&/ควรตรวจ/.test(m.note||'')).length;
+  return {fB,fI,kB,kI,esr,warn};
+}
+const ALL=summary(null);
+/* ---------- UI state ---------- */
+let tab='all', filter='none', hl=null;
+const $=s=>document.querySelector(s);
+document.getElementById('lnkSheet').href=SHEET+'/edit';
+document.getElementById('lnkDrive').href=(DATA.beh.find(b=>b.photo)||{}).photo||SHEET;
+
+/* ---------- verdict cards ---------- */
+function verdict(){
+  const s=ALL;
+  $('#verd').innerHTML=`
+  <div class="card ok">
+    <h3>สมมติฐานรอง · Forget Rate</h3>
+    <div class="big mono"><span style="color:var(--coral)">${s.fB.fr.toFixed(1)}%</span><span class="arr">→</span><span style="color:var(--mint)">${s.fI.fr.toFixed(1)}%</span></div>
+    <div class="sub">ห้องว่างแต่ยังเปิดไฟหรือแอร์ : Baseline ${s.fB.forget}/${s.fB.empty} ครั้ง · ติดป้าย ${s.fI.forget}/${s.fI.empty} ครั้ง · Fisher p &lt; 0.001</div>
+    <span class="tag ok">✓ เป็นไปตามสมมติฐาน</span>
+    <button class="btn sm" style="margin-left:8px;margin-top:8px" data-how="h2">วิธีคิด ▾</button>
+    <div class="how" id="how-h2"><ol>
+      <li>นับครั้งที่ตรวจแล้วพบ <b>ห้องว่าง</b> (ทุกรอบ ทั้ง 12.15 และสุ่ม) : Baseline <span class="mono">${s.fB.empty}</span> · ติดป้าย <span class="mono">${s.fI.empty}</span></li>
+      <li>ในนั้น นับครั้งที่ <b>ไฟหรือแอร์ยังเปิด</b> : Baseline <span class="mono">${s.fB.forget}</span> · ติดป้าย <span class="mono">${s.fI.forget}</span></li>
+      <li>Forget Rate = ข้อ 2 ÷ ข้อ 1 × 100 : <span class="mono">${s.fB.forget}/${s.fB.empty} = ${s.fB.fr.toFixed(1)}%</span> และ <span class="mono">${s.fI.forget}/${s.fI.empty} = ${s.fI.fr.toFixed(1)}%</span></li>
+      <li>ห้องที่ <b>มีคนอยู่</b> ไม่นับ เพราะเปิดไฟตอนใช้งานไม่ใช่การลืม</li>
+    </ol><div class="hlb"><button class="btn sm" data-hl="empty">ไฮไลท์วันที่ห้องว่าง (ตัวหาร)</button><button class="btn sm" data-hl="forget">ไฮไลท์วันที่ลืม (ตัวตั้ง)</button></div></div>
+  </div>
+  <div class="card no">
+    <h3>สมมติฐานหลัก · หน่วยไฟช่วงพักเที่ยง</h3>
+    <div class="big mono">${s.kB.mean.toFixed(3)}<span class="arr">→</span>${s.kI.mean.toFixed(3)} <span style="font-size:.45em;color:var(--muted)">kWh / บ้าน / ชม.</span></div>
+    <div class="sub">ลดลง ${s.esr.toFixed(1)}% แต่ Welch t-test p = 0.153 (ไม่มีนัยสำคัญ) · ${s.warn} จาก 75 แถวมิเตอร์ถูกบันทึกว่าควรตรวจซ้ำ</div>
+    <span class="tag no">✕ ไม่เป็นไปตามสมมติฐาน (ลดลงแต่ไม่มีนัยสำคัญ)</span>
+    <button class="btn sm" style="margin-left:8px;margin-top:8px" data-how="h1">วิธีคิด ▾</button>
+    <div class="how" id="how-h1"><ol>
+      <li>หน่วยไฟต่อวัน = เลขมิเตอร์ 13.00 − 12.00 (ดูได้ในแต่ละแถว)</li>
+      <li>เฉลี่ย Baseline <span class="mono">${s.kB.mean.toFixed(3)}</span> (${s.kB.n} แถว) · เฉลี่ยติดป้าย <span class="mono">${s.kI.mean.toFixed(3)}</span> (${s.kI.n} แถว)</li>
+      <li>Energy Saving Rate = (${s.kB.mean.toFixed(3)} − ${s.kI.mean.toFixed(3)}) ÷ ${s.kB.mean.toFixed(3)} × 100 = <span class="mono">${s.esr.toFixed(1)}%</span></li>
+      <li>Cost Saving = ${(s.kB.mean-s.kI.mean).toFixed(3)} × ${s.kI.n} × 4.4 บาท = <span class="mono">${((s.kB.mean-s.kI.mean)*s.kI.n*4.4).toFixed(2)} บาท</span> (ตัวเลขนี้ไม่มีนัยสำคัญ ห้ามอ้าง)</li>
+      <li>ทำไมยังอ้างไม่ได้ : ไฟไม่ได้ลดในวันที่ห้องว่าง (จุดที่ป้ายมีผล) และค่าที่ต่ำผิดปกติกระจุกอยู่ที่บ้านที่มิเตอร์อ่านยาก</li>
+    </ol><div class="hlb"><button class="btn sm" data-hl="warn">ไฮไลท์แถวมิเตอร์ที่ควรตรวจซ้ำ</button><button class="btn sm" data-hl="implaus">ไฮไลท์ค่าที่เป็นไปได้ยาก</button></div></div>
+  </div>`;
+}
+/* ---------- tabs ---------- */
+function tabs(){
+  const cnt=o=>{if(!hl)return '';const n=H[o].days.filter(d=>match(d)).length;return `<span class="n ${n?'hot':''}">${n}</span>`};
+  $('#tabs').innerHTML=`<button class="tab ${tab==='all'?'on':''}" data-tab="all">ทุกบ้าน</button>`+
+    OFFICES.map(([o])=>`<button class="tab ${tab===o?'on':''}" data-tab="${o}">${o}${cnt(o)}</button>`).join('');
+}
+function match(d){
+  if(!hl)return false;
+  if(hl==='empty')return d.r12==='ok'||d.r12==='forget'||d.rr.some(r=>r==='ok'||r==='forget');
+  if(hl==='forget')return d.r12==='forget'||d.rr.includes('forget');
+  if(hl==='warn')return d.flags.some(f=>f.t==='w'&&/ตรวจซ้ำ/.test(f.x));
+  if(hl==='implaus')return d.flags.some(f=>f.t==='e');
+  return false;
+}
+/* ---------- overview ---------- */
+function overview(){
+  return `<div class="legend"><span><i style="background:var(--coral)"></i>ห้องว่างแต่ยังเปิดไฟ/แอร์ (ลืม)</span><span><i style="background:var(--mint)"></i>ห้องว่างและปิดครบ</span><span><i style="background:rgba(143,160,184,.35)"></i>มีคนอยู่ (นับไม่ได้)</span><span>ขีดส้มใต้ช่อง = Baseline</span></div>
+  <div class="ov">`+OFFICES.map(([o,lab])=>{
+    const s=summary(o);
+    const fr=x=>x.fr==null?'ไม่มีห้องว่าง':`${x.forget}/${x.empty} = ${x.fr.toFixed(0)}%`;
+    return `<div class="card hc" data-go="${o}"><h4>${o}<small>${lab}</small></h4>
+      <div class="strip">${H[o].days.map(d=>`<i class="${d.r12||''} ${d.bl?'bl':''}" title="${fdate(d.date)}"></i>`).join('')}</div>
+      <div class="kv"><span>Forget Rate ก่อน</span><b>${fr(s.fB)}</b><span>Forget Rate หลัง</span><b>${fr(s.fI)}</b>
+      <span>kWh เฉลี่ย ก่อน → หลัง</span><b>${s.kB.mean.toFixed(2)} → ${s.kI.mean.toFixed(2)}</b><span>เปลี่ยน</span><b style="color:${s.esr>0?'var(--mint)':'var(--coral)'}">${s.esr>0?'ลด':'เพิ่ม'} ${Math.abs(s.esr).toFixed(0)}%</b>
+      <span>มิเตอร์ควรตรวจซ้ำ</span><b style="color:${s.warn?'var(--coral)':'var(--muted)'}">${s.warn} วัน</b></div>
+      <div style="margin-top:10px"><span class="btn sm">ดูรายวัน →</span></div></div>`}).join('')+`</div>`;
+}
+/* ---------- house view ---------- */
+function house(o){
+  const s=summary(o); const lab=OFFICES.find(x=>x[0]===o)[1];
+  const fr=x=>x.fr==null?`<div class="v mu">ไม่มีห้องว่าง</div><div class="s">ตรวจ ${x.n} ครั้ง มีคนอยู่ทุกครั้ง</div>`:`<div class="v ${x.fr>50?'co':(x.fr>0?'':'mi')}">${x.fr.toFixed(0)}%</div><div class="s">ลืม ${x.forget} จากห้องว่าง ${x.empty} ครั้ง (ตรวจ ${x.n})</div>`;
+  const days=H[o].days.filter(d=>{
+    if(filter==='forget')return d.r12==='forget'||d.rr.includes('forget');
+    if(filter==='empty')return d.r12!=='occ'||d.rr.some(r=>r!=='occ');
+    if(filter==='warn')return d.flags.length>0;
+    return true;});
+  let out=`<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;align-items:baseline;margin-bottom:8px"><h2 style="font-size:22px;font-weight:800">${o} <span style="font-size:13px;color:var(--muted);font-weight:600">${lab}</span></h2></div>
+  <div class="hsum">
+    <div class="stat"><div class="l">Forget Rate · Baseline</div>${fr(s.fB)}</div>
+    <div class="stat"><div class="l">Forget Rate · ติดป้าย</div>${fr(s.fI)}</div>
+    <div class="stat"><div class="l">kWh เฉลี่ย/ชม. · Baseline</div><div class="v">${s.kB.mean.toFixed(3)}</div><div class="s">${s.kB.n} วัน</div></div>
+    <div class="stat"><div class="l">kWh เฉลี่ย/ชม. · ติดป้าย</div><div class="v">${s.kI.mean.toFixed(3)}</div><div class="s">${s.kI.n} วัน</div></div>
+    <div class="stat"><div class="l">Energy Saving Rate</div><div class="v ${s.esr>0?'mi':'co'}">${s.esr>0?'−':'+'}${Math.abs(s.esr).toFixed(1)}%</div><div class="s">${s.esr>0?'ใช้ไฟลดลง':'ใช้ไฟเพิ่มขึ้น'}</div></div>
+    <div class="stat"><div class="l">มิเตอร์ควรตรวจซ้ำ</div><div class="v ${s.warn?'co':'mu'}">${s.warn}<span style="font-size:12px"> / 15 วัน</span></div><div class="s">ตามหมายเหตุผู้อ่านค่า</div></div>
+  </div>
+  <div class="filters">แสดง : <button class="chip ${filter==='none'?'on':''}" data-f="none">ทุกวัน</button><button class="chip ${filter==='empty'?'on':''}" data-f="empty">เฉพาะวันที่พบห้องว่าง</button><button class="chip ${filter==='forget'?'on':''}" data-f="forget">เฉพาะวันที่ลืม</button><button class="chip ${filter==='warn'?'on':''}" data-f="warn">เฉพาะวันที่มีข้อสังเกต ⚠</button><span style="margin-left:auto;font-size:11.5px">กดแถวเพื่อดูบันทึกดิบและหลักฐาน</span></div>
+  <div class="days">`;
+  let ph=null;
+  if(!days.length)out+=`<div class="empty">ไม่มีวันที่ตรงเงื่อนไข</div>`;
+  for(const d of days){
+    const p=d.bl?'bl':'iv';
+    if(p!==ph){ph=p;out+=`<div class="ph ${p}">${d.bl?'Baseline · ยังไม่ติดป้าย':'ติดป้ายแล้ว'}</div>`}
+    out+=dayRow(o,d);
+  }
+  return out+`</div>`;
+}
+const RES={forget:'ลืม · ห้องว่างแต่ยังเปิด',ok:'ปิดครบ',occ:'มีคนอยู่'};
+const chip=(l,v)=>`<span class="c ${v==='เปิด'?'on':(v==='ปิด'?'off':'')}">${l} ${esc(v??'-')}</span>`;
+function dayRow(o,d){
+  const m=d.met,b=d.b12;
+  const cls=[hl?(match(d)?'hl':'dim'):''].join(' ');
+  const rnd=d.rnd.length?d.rnd.map((r,i)=>{const rr=d.rr[i];return `<span class="res ${rr}" style="font-size:12px">${rr==='occ'?'มีคน':RES[rr]}</span>`}).join(' '):`<span class="res none">ไม่มีสุ่มตรวจ</span>`;
+  return `<div class="day ${cls}" data-key="${o}|${d.date}">
+    <div class="row">
+      <div class="d"><b>${fdate(d.date)}</b><span class="pb ${d.bl?'':'iv'}">${d.bl?'BASELINE':'ติดป้าย'}</span></div>
+      <div><span class="lab">ตรวจ 12.15 น.</span><div class="chips">${b?`<span class="c ${b.occ==='ห้องว่าง'?'emp':''}">${esc(b.occ)}</span>${chip('ไฟ',b.light)}${chip('แอร์',b.ac)} <span class="res ${d.r12}">${RES[d.r12]}</span>`:'<span class="res none">ไม่มีบันทึก</span>'}</div></div>
+      <div><span class="lab">สุ่มตรวจ</span><div class="chips">${rnd}</div></div>
+      <div class="kwh"><span class="lab">หน่วยไฟ 12.00–13.00</span>${m?`<b class="${m.kwh<=0.3?'low':''}">${m.kwh.toFixed(2)}</b> <span style="font-size:11px;color:var(--muted)">kWh</span><small>${m.r12} → ${m.r13}${m.temp!=null?` · ${m.temp.toFixed(1)}°C`:''}</small>`:'<span class="res none">ไม่มีค่า</span>'}</div>
+      <div class="flags">${d.flags.map(f=>`<span class="flag ${f.t}">${f.t==='e'?'⛔':'⚠'} ${esc(f.x)}</span>`).join('')||'<span style="color:var(--faint)">ไม่มีข้อสังเกต</span>'}</div>
+    </div>
+    <div class="det">
+      <div><h5>บันทึกพฤติกรรม (Log_พฤติกรรม)</h5>${[b,...d.rnd].filter(Boolean).map(x=>`<table>
+        <tr><td>แถวในชีต</td><td class="v"><a href="${sheetLink('beh',x.row)}" target="_blank" rel="noopener">แถว ${x.row} ↗</a> · ${esc(x.round)} ${esc(x.time)}</td></tr>
+        <tr><td>สถานะบุคคล</td><td class="v">${esc(x.occ)}</td></tr><tr><td>ไฟ / แอร์</td><td class="v">${esc(x.light)} / ${esc(x.ac)}</td></tr>
+        <tr><td>ผู้บันทึก</td><td class="v">${esc(x.by)}</td></tr>${x.note?`<tr><td>หมายเหตุ</td><td class="v">${esc(x.note)}</td></tr>`:''}
+      </table>`).join('<div style="height:8px"></div>')||'<div class="note">ไม่มีบันทึกวันนี้</div>'}
+      <div class="links">${b?`<a class="btn sm" href="${sheetLink('beh',b.row)}" target="_blank" rel="noopener">📊 ไปที่แถว ${b.row} ใน Sheet</a>`:''}${b&&b.photo?`<a class="btn sm" href="${esc(b.photo)}" target="_blank" rel="noopener">📁 รูปถ่ายยืนยัน (Drive)</a>`:''}</div></div>
+      <div><h5>บันทึกมิเตอร์ (Log_มิเตอร์ไฟฟ้า)</h5>${m?`<table>
+        <tr><td>แถวในชีต</td><td class="v"><a href="${sheetLink('met',m.row)}" target="_blank" rel="noopener">แถว ${m.row} ↗</a></td></tr>
+        <tr><td>เลขมิเตอร์ 12.00</td><td class="v mono">${m.r12}</td></tr><tr><td>เลขมิเตอร์ 13.00</td><td class="v mono">${m.r13}</td></tr>
+        <tr><td>หน่วยที่ใช้</td><td class="v mono">${m.r13} − ${m.r12} = ${m.kwh.toFixed(2)} kWh</td></tr>
+        <tr><td>อุณหภูมิภายนอก</td><td class="v">${m.temp!=null?m.temp.toFixed(2)+' °C':'ไม่มีค่า'}</td></tr>
+        <tr><td>ผู้บันทึก</td><td class="v">${esc(m.by)}</td></tr>
+        <tr><td>หมายเหตุ</td><td class="v note">${esc(m.note||'-')}</td></tr></table>
+        <div class="links"><a class="btn sm mi" href="${esc(m.link12||'#')}" target="_blank" rel="noopener">📷 รูปมิเตอร์ 12.00</a><a class="btn sm mi" href="${esc(m.link13||'#')}" target="_blank" rel="noopener">📷 รูปมิเตอร์ 13.00</a><a class="btn sm" href="${sheetLink('met',m.row)}" target="_blank" rel="noopener">📊 ไปที่แถว ${m.row} ใน Sheet</a></div>`:'<div class="note">ไม่มีค่ามิเตอร์วันนี้</div>'}</div>
+    </div>
+  </div>`;
+}
+/* ---------- render ---------- */
+function render(){
+  tabs();
+  $('#view').innerHTML=tab==='all'?overview():house(tab);
+  $('#toast').classList.toggle('on',!!hl);
+  if(hl){const n=Object.values(H).reduce((a,h)=>a+h.days.filter(match).length,0);
+    $('#toastTx').textContent={empty:'ไฮไลท์วันที่พบห้องว่าง',forget:'ไฮไลท์วันที่ลืมปิด',warn:'ไฮไลท์แถวมิเตอร์ที่ควรตรวจซ้ำ',implaus:'ไฮไลท์ค่ามิเตอร์ที่เป็นไปได้ยาก'}[hl]+` · ${n} วัน · เลขบนแท็บ = จำนวนต่อบ้าน`}
+  location.hash=tab==='all'?'':tab;
+}
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-tab],[data-go],[data-f],[data-hl],[data-how],.row,#toastX');
+  if(!t)return;
+  if(t.dataset.tab){tab=t.dataset.tab;filter='none';render();window.scrollTo({top:$('#tabs').offsetTop-4,behavior:'smooth'});return}
+  if(t.dataset.go){tab=t.dataset.go;filter='none';render();window.scrollTo({top:$('#tabs').offsetTop-4,behavior:'smooth'});return}
+  if(t.dataset.f){filter=t.dataset.f;render();return}
+  if(t.dataset.hl){hl=hl===t.dataset.hl?null:t.dataset.hl;if(hl&&tab==='all'){tab=OFFICES[0][0]}render();return}
+  if(t.dataset.how){const el=document.getElementById('how-'+t.dataset.how);el.classList.toggle('on');t.textContent=el.classList.contains('on')?'วิธีคิด ▴':'วิธีคิด ▾';return}
+  if(t.id==='toastX'){hl=null;render();return}
+  if(t.classList.contains('row')){t.parentElement.classList.toggle('open')}
+});
+const h=location.hash.slice(1); if(OFFICES.some(x=>x[0]===h))tab=h;
+verdict(); render();
+window.__PBL={summary,H,ALL};
+})();
+</script>
+</body>
+</html>
