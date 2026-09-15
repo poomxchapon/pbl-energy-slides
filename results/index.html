@@ -8,135 +8,219 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --ink0:#070C16; --ink1:#0B1220; --ink2:#111A2C; --ink3:#182338;
-    --surface:rgba(255,255,255,.045); --surface2:rgba(255,255,255,.08);
-    --line:rgba(255,176,32,.18); --line2:rgba(255,255,255,.10);
-    --fg:#EDF1F7; --muted:#8FA0B8; --faint:rgba(143,160,184,.6);
-    --amber:#FFB020; --mint:#3ED598; --coral:#FF6B6B; --sky:#6AA9FF;
-    --r:14px; --rs:9px;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{color-scheme:dark}
-  body{font-family:"Noto Sans Thai","Leelawadee UI","Sarabun",sans-serif;color:var(--fg);line-height:1.6;background:
-    radial-gradient(1100px 600px at 90% -10%,rgba(255,176,32,.07),transparent 60%),
-    radial-gradient(900px 560px at -10% 100%,rgba(62,213,152,.05),transparent 58%),
-    linear-gradient(180deg,var(--ink1),var(--ink0) 60%);min-height:100vh}
-  .mono{font-family:"JetBrains Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
-  a{color:var(--sky)}
-  .wrap{max-width:1180px;margin:0 auto;padding:18px clamp(14px,3vw,32px) 80px}
+:root{--ink0:#070C16;--ink1:#0B1220;--ink2:#111A2C;--ink3:#182338;--surface:rgba(255,255,255,.045);--surface2:rgba(255,255,255,.08);--line:rgba(255,176,32,.16);--line2:rgba(255,255,255,.10);--fg:#EDF1F7;--muted:#8FA0B8;--faint:rgba(143,160,184,.62);--amber:#FFB020;--mint:#3ED598;--coral:#FF6B6B;--sky:#6AA9FF;--shadow:0 26px 70px rgba(0,0,0,.55);--r:16px;--rs:11px;--readable:#ADBACE}
 
-  header{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:flex-end;justify-content:space-between;padding:8px 0 16px;border-bottom:1px solid var(--line2);margin-bottom:18px}
-  .kick{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);font-weight:800;display:flex;align-items:center;gap:9px}
-  .kick::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 10px var(--amber)}
-  h1{font-size:clamp(20px,3vw,30px);font-weight:800;line-height:1.25;margin-top:4px}
-  h1 .am{color:var(--amber)}
-  .src{display:flex;flex-wrap:wrap;gap:8px}
-  .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line2);background:var(--surface);color:var(--fg);padding:7px 12px;border-radius:999px;font-size:12.5px;font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap;transition:.15s}
-  .btn:hover{border-color:var(--amber);background:rgba(255,176,32,.1);color:var(--amber)}
-  .btn.sm{padding:4px 9px;font-size:11.5px}
-  .btn.mi{border-color:rgba(62,213,152,.35);color:var(--mint)} .btn.mi:hover{background:rgba(62,213,152,.12)}
+*{box-sizing:border-box;margin:0;padding:0;min-width:0}
+html{color-scheme:dark}
 
-  /* verdict */
-  .verd{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
-  .card{background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--line2);border-radius:var(--r);padding:16px 18px;position:relative}
-  .card::before{content:"";position:absolute;top:-1px;left:16px;right:16px;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--amber),transparent);opacity:.55}
-  .card.ok::before{background:linear-gradient(90deg,transparent,var(--mint),transparent)}
-  .card.no::before{background:linear-gradient(90deg,transparent,var(--coral),transparent)}
-  .card h3{font-size:12px;letter-spacing:.08em;color:var(--muted);font-weight:700;text-transform:uppercase}
-  .card .big{font-family:"JetBrains Mono",monospace;font-size:clamp(24px,3.6vw,38px);font-weight:700;line-height:1.1;margin:6px 0 2px}
-  .card .big .arr{color:var(--muted);font-size:.6em;margin:0 8px}
-  .card .sub{font-size:13px;color:var(--muted)}
-  .tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;padding:3px 10px;border-radius:999px;margin-top:8px}
-  .tag.ok{background:rgba(62,213,152,.14);color:var(--mint);border:1px solid rgba(62,213,152,.4)}
-  .tag.no{background:rgba(255,107,107,.14);color:var(--coral);border:1px solid rgba(255,107,107,.4)}
-  .how{margin-top:10px;border-top:1px dashed var(--line2);padding-top:10px;display:none}
-  .how.on{display:block}
-  .how ol{padding-left:20px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
-  .how li b{color:var(--fg)} .how li .mono{color:var(--amber)}
-  .how .hlb{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}
+body{font-family:"Noto Sans Thai","Leelawadee UI","Sarabun",sans-serif;color:var(--fg);font-size:14px;line-height:1.7;background:radial-gradient(1100px 620px at 84% -12%,rgba(255,176,32,.07),transparent 62%),linear-gradient(180deg,var(--ink1),var(--ink0));min-height:100vh}
 
-  /* tabs */
-  .tabs{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 14px;position:sticky;top:0;z-index:5;padding:10px 0;background:linear-gradient(180deg,var(--ink1) 70%,transparent)}
-  .tab{border:1px solid var(--line2);background:var(--surface);color:var(--muted);padding:8px 14px;border-radius:999px;font-weight:700;font-size:13.5px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:.15s}
-  .tab:hover{color:var(--fg);border-color:var(--amber)}
-  .tab.on{background:rgba(255,176,32,.16);color:var(--amber);border-color:var(--amber)}
-  .tab .n{font-family:"JetBrains Mono",monospace;font-size:11px;background:rgba(0,0,0,.35);padding:1px 7px;border-radius:999px;color:var(--fg)}
-  .tab .n.hot{background:var(--coral);color:#fff}
+button,a{-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:background-color .18s,border-color .18s,color .18s,box-shadow .18s}
+button{font:inherit;color:inherit;text-align:left}
+button:not(:disabled){cursor:pointer}
+:focus-visible{outline:3px solid var(--amber);outline-offset:4px}
+a{color:var(--sky);text-underline-offset:4px;overflow-wrap:anywhere}
+a:hover{color:var(--amber)}
 
-  /* overview grid */
-  .ov{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
-  .hc{cursor:pointer;transition:.15s} .hc:hover{transform:translateY(-2px);border-color:var(--amber)}
-  .hc h4{font-size:17px;font-weight:800;display:flex;justify-content:space-between;align-items:center}
-  .hc h4 small{font-size:11px;color:var(--muted);font-weight:600}
-  .strip{display:grid;grid-template-columns:repeat(15,1fr);gap:3px;margin:10px 0 8px}
-  .strip i{height:16px;border-radius:3px;background:rgba(255,255,255,.07);position:relative}
-  .strip i.forget{background:var(--coral)} .strip i.ok{background:var(--mint)} .strip i.occ{background:rgba(143,160,184,.35)}
-  .strip i.bl::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:2px;background:rgba(255,176,32,.5)}
-  .kv{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;font-size:12.5px;color:var(--muted)}
-  .kv b{color:var(--fg);font-family:"JetBrains Mono",monospace;font-weight:600}
-  .legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted);margin:4px 0 14px}
-  .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:5px}
+.mono,.big,.stat .v,.kwh b{font-family:"JetBrains Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.wrap{max-width:1180px;margin:auto;padding:48px 24px 128px}
 
-  /* house summary */
-  .hsum{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
-  .stat{background:var(--surface);border:1px solid var(--line2);border-radius:var(--rs);padding:10px 12px}
-  .stat .l{font-size:11.5px;color:var(--muted)} .stat .v{font-family:"JetBrains Mono",monospace;font-size:20px;font-weight:700;color:var(--amber);line-height:1.2}
-  .stat .v.mi{color:var(--mint)} .stat .v.co{color:var(--coral)} .stat .v.mu{color:var(--muted);font-size:15px}
-  .stat .s{font-size:11px;color:var(--faint)}
-  .stat.click{cursor:pointer} .stat.click:hover{border-color:var(--amber)}
+header{padding-bottom:32px;display:flex;flex-wrap:wrap;gap:24px;margin-bottom:32px;border-bottom:1px solid var(--line2)}
+.kick{font-size:12px;color:var(--amber);font-weight:700;display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.kick::before{content:"";width:8px;height:8px;flex:none;border-radius:50%;background:var(--amber);box-shadow:0 0 12px rgba(255,176,32,.35)}
+.kick::after{content:"";height:1px;max-width:160px;flex:1;background:linear-gradient(90deg,var(--line),transparent)}
+h1{font-size:clamp(26px,3.4vw,40px);line-height:1.6;font-weight:800;text-wrap:balance}
+.am{color:var(--amber)}
+header .sub{max-width:88ch}
+.src{display:flex;flex-wrap:wrap;align-items:center;align-self:flex-end;gap:8px}
 
-  .filters{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0 10px;font-size:12.5px;color:var(--muted)}
-  .chip{border:1px solid var(--line2);background:var(--surface);color:var(--muted);padding:4px 10px;border-radius:999px;font-size:12px;cursor:pointer;font-weight:600}
-  .chip.on{border-color:var(--amber);color:var(--amber);background:rgba(255,176,32,.12)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;border:1px solid var(--line2);background:var(--surface);color:var(--fg);padding:8px 16px;border-radius:12px;font-size:13px;font-weight:600;text-decoration:none;line-height:1.6}
+.btn:hover:not(:disabled){border-color:var(--amber);background:rgba(255,176,32,.09);color:var(--amber)}
+.btn.sm{padding:8px 12px;font-size:12px}
+.btn.mi{color:var(--mint);border-color:rgba(62,213,152,.25)}
+.btn:disabled{color:var(--muted);background:rgba(143,160,184,.04);border-style:dashed;cursor:default}
 
-  /* day rows */
-  .days{display:flex;flex-direction:column;gap:8px}
-  .ph{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:800;margin:10px 0 2px;display:flex;align-items:center;gap:10px}
-  .ph::after{content:"";flex:1;height:1px;background:var(--line2)}
-  .ph.iv{color:var(--amber)}
-  .day{background:var(--surface);border:1px solid var(--line2);border-radius:var(--r);overflow:hidden;transition:border-color .15s}
-  .day.hl{border-color:var(--amber);box-shadow:0 0 0 2px rgba(255,176,32,.25)}
-  .day.dim{opacity:.35}
-  .row{display:grid;grid-template-columns:118px 1.35fr .9fr 1.05fr 1fr;gap:10px;padding:11px 14px;align-items:center;cursor:pointer}
-  .row:hover{background:rgba(255,255,255,.03)}
-  .d{line-height:1.2} .d b{font-size:15px;display:block} .d span{font-size:11px;color:var(--muted)}
-  .d .pb{display:inline-block;margin-top:4px;font-size:10px;font-weight:800;padding:1px 7px;border-radius:999px;background:rgba(143,160,184,.18);color:var(--muted);letter-spacing:.06em}
-  .d .pb.iv{background:rgba(255,176,32,.16);color:var(--amber)}
-  .lab{font-size:10.5px;color:var(--faint);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:3px}
-  .c{display:inline-flex;align-items:center;gap:4px;font-size:12px;padding:2px 8px;border-radius:6px;background:rgba(255,255,255,.06);color:var(--muted);white-space:nowrap}
-  .c.on{background:rgba(255,176,32,.14);color:var(--amber)} .c.off{background:rgba(62,213,152,.12);color:var(--mint)} .c.emp{background:rgba(106,169,255,.14);color:var(--sky)}
-  .chips{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
-  .res{font-weight:800;font-size:13px;padding:3px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:5px}
-  .res.forget{background:rgba(255,107,107,.16);color:var(--coral);border:1px solid rgba(255,107,107,.45)}
-  .res.ok{background:rgba(62,213,152,.14);color:var(--mint);border:1px solid rgba(62,213,152,.4)}
-  .res.occ{background:rgba(143,160,184,.14);color:var(--muted);border:1px solid var(--line2)}
-  .res.none{color:var(--faint);font-weight:600}
-  .kwh{line-height:1.25} .kwh b{font-family:"JetBrains Mono",monospace;font-size:20px;font-weight:700;color:var(--amber)} .kwh b.low{color:var(--coral)}
-  .kwh small{display:block;font-size:11px;color:var(--muted);font-family:"JetBrains Mono",monospace}
-  .flags{display:flex;flex-direction:column;gap:3px;font-size:11.5px}
-  .flag{color:var(--coral);font-weight:700} .flag.w{color:var(--amber)}
-  .ev{display:flex;flex-wrap:wrap;gap:5px;justify-self:end}
-  .det{display:none;border-top:1px solid var(--line2);background:rgba(0,0,0,.25);padding:12px 14px 14px;font-size:12.5px}
-  .day.open .det{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  .det h5{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);margin-bottom:6px}
-  .det table{border-collapse:collapse;width:100%} .det td{padding:3px 6px;border-bottom:1px solid var(--line2);vertical-align:top;color:var(--muted)}
-  .det td:first-child{color:var(--faint);white-space:nowrap;width:120px} .det td.v{color:var(--fg)}
-  .det .links{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}
-  .note{color:var(--muted);font-size:12px;line-height:1.5;word-break:break-word}
-  .empty{padding:24px;text-align:center;color:var(--muted);border:1px dashed var(--line2);border-radius:var(--r)}
-  .foot{margin-top:28px;font-size:11.5px;color:var(--faint);display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:space-between}
-  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink3);border:1px solid var(--amber);color:var(--fg);padding:10px 16px;border-radius:999px;font-size:13px;z-index:20;display:none;box-shadow:0 12px 40px rgba(0,0,0,.5)}
-  .toast.on{display:flex;gap:10px;align-items:center}
-  .toast button{background:none;border:none;color:var(--amber);font-weight:800;cursor:pointer;font-family:inherit}
+.verd{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px;align-items:start}
+.card{position:relative;background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--line2);border-radius:var(--r);padding:24px}
+.verd .card{display:flex;flex-direction:column;min-height:336px;padding:32px;box-shadow:0 16px 48px rgba(0,0,0,.18);border-top:2px solid var(--mint)}
+.verd .card.ok{background:radial-gradient(ellipse at top right,rgba(62,213,152,.07),transparent 75%),var(--ink2)}
+.verd .card.no{border-top-color:var(--coral);background:radial-gradient(ellipse at top right,rgba(255,107,107,.06),transparent 75%),var(--ink2)}
+.card h3{font-size:14px;font-weight:600;color:var(--readable);line-height:1.7}
+.hyp{display:inline-flex;align-items:center;justify-content:center;margin-right:8px;width:32px;height:32px;border-radius:8px;font-size:12px;font-weight:700;background:var(--surface2);color:var(--fg)}
+.card .big{font-size:clamp(30px,3.6vw,44px);font-weight:700;line-height:1.35;margin:24px 0 16px;white-space:nowrap}
+.big .arr{font-size:.6em;color:var(--muted);margin:0 12px;vertical-align:middle}
+.big .unit{display:block;font-family:"Noto Sans Thai",sans-serif;font-size:12px;font-weight:500;color:var(--muted);margin-top:8px}
+.card .sub{font-size:13px;color:var(--readable);line-height:1.8}
 
-  @media (max-width:900px){
-    .verd{grid-template-columns:1fr}
-    .row{grid-template-columns:1fr 1fr;gap:8px}
-    .row .d{grid-column:1/-1;display:flex;gap:10px;align-items:baseline} .row .d .pb{margin:0}
-    .ev{grid-column:1/-1;justify-self:start}
-    .day.open .det{grid-template-columns:1fr}
-  }
+.verdict-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;margin-top:auto;padding-top:24px}
+.tag{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;padding:8px 12px;border-radius:12px;line-height:1.7}
+.tag.ok{background:rgba(62,213,152,.1);color:var(--mint)}
+.tag.no{background:rgba(255,107,107,.1);color:var(--coral)}
+.how{display:none;margin-top:24px;padding-top:24px;border-top:1px solid var(--line2)}
+.how.on{display:block}
+.how ol{padding-left:24px;display:grid;gap:12px;font-size:13px;color:var(--readable)}
+.how li::marker{color:var(--amber);font-family:"JetBrains Mono",monospace}
+.how li b{color:var(--fg)}
+.how .mono{color:var(--amber)}
+.hlb{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+.count-note,.strip-caption{font-size:12px;color:var(--muted)}
+.count-note{margin:8px 0}
+
+.tabs{display:flex;gap:8px;position:sticky;top:0;z-index:5;background:var(--ink1);border-bottom:1px solid var(--line2);margin:0 0 32px;padding:16px 8px;overflow-x:auto;scrollbar-width:thin;scroll-padding-inline:8px}
+.tab{display:flex;flex:none;align-items:center;gap:8px;border:1px solid transparent;background:transparent;color:var(--readable);padding:8px 16px;min-height:44px;border-radius:12px;font-size:14px;font-weight:700;white-space:nowrap}
+.tab:hover{background:var(--surface2);color:var(--fg)}
+.tab.on{color:var(--amber);background:rgba(255,176,32,.1);border-color:var(--line)}
+.tab .n{font-family:"JetBrains Mono",monospace;font-size:12px;min-width:24px;text-align:center;padding:0 6px;border-radius:6px;background:var(--surface2);color:var(--readable)}
+.tab .n.hot{background:var(--amber);color:var(--ink0)}
+
+.legend{display:flex;flex-wrap:wrap;gap:8px 24px;font-size:12px;color:var(--readable);margin:8px 0 24px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:8px}
+.ov{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.hc{background:var(--surface);display:flex;flex-direction:column}
+.hc:focus-within,.hc:hover{border-color:var(--line);background:rgba(255,255,255,.06)}
+.hc h4{font-size:20px;font-family:"JetBrains Mono",monospace;line-height:1.6}
+.hc h4 small{display:block;font:500 12px/1.7 "Noto Sans Thai",sans-serif;color:var(--muted);margin-top:4px}
+.strip{display:grid;grid-template-columns:repeat(15,minmax(0,1fr));gap:4px;margin:24px 0 12px}
+.strip i{height:24px;border-radius:4px;background:var(--surface2);position:relative}
+.strip i.forget{background:var(--coral)}
+.strip i.ok{background:var(--mint)}
+.strip i.occ{background:rgba(143,160,184,.35)}
+.strip i.bl::after{content:"";position:absolute;left:0;right:0;bottom:-5px;height:2px;background:var(--amber)}
+.kv{display:grid;grid-template-columns:1fr auto;gap:8px;font-size:12px;color:var(--readable);margin-top:24px}
+.kv b{color:var(--fg);font-weight:500;text-align:right;font-variant-numeric:tabular-nums}
+.office-cta{margin-top:auto;padding-top:24px}
+.office-cta .btn{width:100%;justify-content:space-between}
+
+.house-heading{display:flex;flex-wrap:wrap;align-items:baseline;gap:16px;margin-bottom:24px}
+.house-heading h2{font-size:28px;font-family:"JetBrains Mono",monospace;line-height:1.6}
+.house-heading h2 span{display:inline-block;font:500 13px/1.7 "Noto Sans Thai",sans-serif;color:var(--muted)}
+.hsum{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:24px}
+.stat{background:var(--surface);border-radius:12px;padding:16px}
+.stat .l{font-size:12px;color:var(--readable);min-height:40px}
+.stat .v{font-size:24px;font-weight:700;color:var(--amber);line-height:1.6;margin:8px 0}
+.stat .v.mi{color:var(--mint)}
+.stat .v.co{color:var(--coral)}
+.stat .v.mu{font-family:inherit;font-size:16px;color:var(--readable)}
+.stat .s{font-size:12px;color:var(--muted)}
+
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12px;color:var(--muted);margin:24px 0}
+.chip{border:1px solid var(--line2);border-radius:12px;background:transparent;color:var(--readable);padding:8px 12px;min-height:40px;font-size:12px;font-weight:600;line-height:1.7}
+.chip:hover{color:var(--fg);background:var(--surface2)}
+.chip.on{border-color:var(--line);background:rgba(255,176,32,.1);color:var(--amber)}
+.filter-hint{flex-basis:100%;font-size:12px;margin-top:8px}
+
+.days{display:flex;flex-direction:column;gap:8px}
+.ph{display:flex;align-items:center;gap:16px;font-size:13px;font-weight:700;color:var(--readable);margin:16px 0 8px}
+.ph::after{content:"";height:1px;flex:1;background:var(--line2)}
+.ph.iv{color:var(--amber)}
+.day{position:relative;border:1px solid transparent;border-radius:var(--r);background:rgba(255,255,255,.025);transition:background-color .18s,border-color .18s}
+.day.hl{border-color:var(--amber);background:rgba(255,176,32,.045)}
+.day.dim{background:var(--ink1);color:var(--readable)}
+.day.dim .d b{color:var(--readable)}
+.day.dim .res{background:var(--ink2)}
+.day.open{background:var(--ink2);border-color:rgba(255,176,32,.45);box-shadow:0 8px 24px rgba(0,0,0,.15)}
+
+.row{position:relative;display:grid;width:100%;grid-template-columns:112px minmax(0,1.5fr) minmax(0,.95fr) minmax(0,1.1fr);gap:16px;align-items:center;padding:24px 40px 24px 24px;border:0;border-radius:var(--r);background:transparent;text-align:left;line-height:1.7}
+.row:hover{background:rgba(255,255,255,.035)}
+.row::after{content:"+";position:absolute;right:16px;top:24px;font-family:"JetBrains Mono",monospace;color:var(--muted);font-size:18px}
+.open .row::after{content:"−";color:var(--amber)}
+.d{position:relative;display:block;padding-left:16px;align-self:stretch;align-content:center;border-left:1px solid rgba(143,160,184,.25)}
+.d::before{content:"";position:absolute;left:-4px;top:8px;width:7px;height:7px;border-radius:50%;background:var(--muted);box-shadow:0 0 0 4px var(--ink1)}
+.open .d::before{box-shadow:0 0 0 4px var(--ink2)}
+.open .d::before,.hl .d::before{background:var(--amber)}
+.d b{font-size:14px;display:block;color:var(--fg)}
+.pb{display:inline-block;margin-top:8px;font-size:12px;color:var(--readable)}
+.pb.iv{color:var(--amber)}
+.lab{display:block;font-size:12px;color:var(--muted);margin-bottom:8px}
+.chips{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.c{display:inline-flex;gap:4px;font-size:12px;color:var(--readable);padding:0 4px;border-radius:4px}
+.c.on{color:var(--amber)}
+.c.off{color:var(--mint)}
+.c.emp{color:var(--sky)}
+
+.res{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:700;padding:4px 8px;border-radius:8px;line-height:1.7}
+.res.forget{background:rgba(255,107,107,.11);color:var(--coral)}
+.res.ok{background:rgba(62,213,152,.1);color:var(--mint)}
+.res.occ{background:rgba(143,160,184,.09);color:var(--readable)}
+.res.none{color:var(--muted);font-size:12px;font-weight:500;padding-left:0}
+.check .res{order:-1;flex-basis:100%;width:fit-content;margin-bottom:4px}
+.kwh b{font-size:24px;color:var(--amber);font-weight:700}
+.kwh small{display:block;font-size:12px;color:var(--readable);font-family:"JetBrains Mono",monospace;overflow-wrap:anywhere;margin-top:4px}
+
+.det{display:none;padding:24px;border-top:1px solid var(--line2);border-radius:0 0 var(--r) var(--r);font-size:13px;background:rgba(0,0,0,.16)}
+.day.open .det{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+.det h5{font-size:13px;color:var(--amber);margin-bottom:16px;font-weight:600;line-height:1.7}
+.det table{width:100%;table-layout:fixed;border-collapse:collapse}
+.det td{padding:8px;border-bottom:1px solid var(--line2);vertical-align:top;word-break:break-word;overflow-wrap:anywhere;color:var(--readable)}
+.det td:first-child{width:112px;color:var(--muted)}
+.det td.v{color:var(--fg)}
+.det .links{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.note{font-size:12px;line-height:1.7;word-break:break-word;color:var(--readable)}
+.notice{margin:0 0 8px;padding:12px 16px;border-radius:12px;background:rgba(255,176,32,.08);border:1px solid var(--line);color:var(--readable);font-size:13px}
+.empty{padding:32px;text-align:center;color:var(--readable);border:1px dashed var(--line2);border-radius:var(--r)}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;margin-top:48px;padding-top:24px;border-top:1px solid var(--line2);font-size:12px;color:var(--muted)}
+.foot>span:first-child{max-width:85ch}
+#ver{white-space:nowrap}
+
+.toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%);width:max-content;max-width:min(92vw,560px);padding:16px;border-radius:16px;background:var(--ink3);border:1px solid var(--amber);box-shadow:var(--shadow);font-size:13px;z-index:20;display:none}
+.toast.on{display:flex;align-items:center;gap:16px}
+.toast button{flex:none;min-height:40px;background:rgba(255,176,32,.1);border:1px solid var(--line);border-radius:8px;color:var(--amber);font-size:12px;font-weight:700;padding:8px}
+.toast button:hover{background:rgba(255,176,32,.2)}
+
+
+@media(max-width:1100px){.hsum{grid-template-columns:repeat(3,minmax(0,1fr))}
+.ov{grid-template-columns:repeat(2,minmax(0,1fr))}
+.verd .card{padding:24px}
+.row{gap:12px;padding-left:16px}
+}
+
+
+@media(max-width:900px){.verd{grid-template-columns:1fr;gap:16px}
+.verd .card{padding:24px}
+.card .big{font-size:40px}
+.row{grid-template-columns:1fr 1fr;gap:24px 16px;padding:24px}
+.row .d{grid-column:1/-1;display:flex;gap:16px;align-items:center;padding-left:16px}
+.d .pb{margin:0}
+.day.open .det{grid-template-columns:1fr;gap:32px}
+.row::after{right:24px}
+.tabs{margin-bottom:24px}
+}
+
+
+@media(max-width:600px){.wrap{padding:24px 16px 160px}
+.verd .card{min-height:0}
+header{gap:16px;padding-bottom:24px;margin-bottom:24px}
+.verd{margin-bottom:16px}
+.verd .card{padding:24px 16px}
+.card .big{font-size:34px}
+.big .arr{margin:0 8px}
+.verdict-actions{gap:8px;align-items:flex-start}
+.tag{padding:8px}
+.src .btn{font-size:12px;padding:8px 12px}
+.tabs{margin-inline:-4px}
+.tab{padding:8px 12px;font-size:13px}
+.ov{grid-template-columns:1fr;gap:16px}
+.card{padding:24px}
+.hsum{grid-template-columns:repeat(2,minmax(0,1fr))}
+.stat{padding:16px}
+.stat .v{font-size:24px}
+.house-heading h2 span{display:block;margin-top:4px}
+.row{padding:16px;gap:24px 16px}
+.row::after{right:16px;top:16px}
+.row .check{grid-column:1/-1}
+.check .res{flex-basis:auto;order:0;margin:0}
+.check .chips{gap:8px}
+.det{padding:16px}
+.det td:first-child{width:104px}
+.det a:not(.btn){display:inline-flex;align-items:center;min-height:40px}
+.toast.on{flex-wrap:wrap;gap:8px}
+.toast button{margin-left:auto}
+.foot{margin-top:32px}
+}
+
+
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}
 </style>
 </head>
 <body>
@@ -155,15 +239,15 @@
 
 <div class="verd" id="verd"></div>
 
-<div class="tabs" id="tabs"></div>
-<div id="view"></div>
+<nav class="tabs" id="tabs" aria-label="เลือกบ้าน"></nav>
+<main id="view"></main>
 
 <div class="foot">
-  <span>ข้อมูลจาก แบบเก็บข้อมูลสำหรับสำรวจ - Update.xlsx (ดาวน์โหลด 15 ก.ย. 2569) · แถวที่อ้างอิงคือเลขแถวจริงในชีต · ค่ามิเตอร์อ่านจากรูปโดย Luna Agent ยังไม่ผ่านการตรวจโดยคน</span>
-  <span class="mono" id="ver">RESULTS v1.0.0</span>
+  <span>ข้อมูลจาก แบบเก็บข้อมูลสำหรับสำรวจ (Google Sheet ของทีม) · เลขแถวคือเลขแถวจริงในชีต</span>
+  <span class="mono" id="ver">RESULTS v1.1.0</span>
 </div>
 </div>
-<div class="toast" id="toast"><span id="toastTx"></span><button id="toastX">ยกเลิกไฮไลท์ ✕</button></div>
+<div class="toast" id="toast"><span id="toastTx" role="status" aria-live="polite"></span><button id="toastX">ยกเลิกไฮไลท์ ✕</button></div>
 
 <script src="data.js"></script>
 <script>
@@ -188,11 +272,7 @@ for(const [o] of OFFICES){
     const met=DATA.met.find(m=>m.office===o&&m.date===d)||null;
     const b12=DATA.beh.find(b=>b.office===o&&b.date===d&&b.round.includes('12.15'))||null;
     const rnd=DATA.beh.filter(b=>b.office===o&&b.date===d&&b.round.includes('สุ่ม'));
-    const flags=[];
-    if(met&&/ควรตรวจ/.test(met.note||''))flags.push({t:'w',x:'ผู้อ่านมิเตอร์บันทึกว่าควรตรวจซ้ำ'});
-    if(met&&b12&&b12.ac==='เปิด'&&met.kwh<=0.3)flags.push({t:'e',x:`แอร์เปิดตอน 12.15 แต่มิเตอร์อ่านได้ ${met.kwh.toFixed(2)} kWh (เป็นไปได้ยาก)`});
-    if(met&&met.temp==null)flags.push({t:'w',x:'ไม่มีค่าอุณหภูมิ'});
-    H[o].days.push({date:d,bl:isBL(d),met,b12,rnd,r12:res12(b12),rr:rnd.map(res12),flags});
+    H[o].days.push({date:d,bl:isBL(d),met,b12,rnd,r12:res12(b12),rr:rnd.map(res12)});
   }
 }
 /* ---------- calculations (Forget Rate นับทุกรอบที่ห้องว่าง) ---------- */
@@ -207,8 +287,7 @@ function summary(office){
   const MB=DATA.met.filter(m=>mf(m)&&m.phase==='Baseline'),MI=DATA.met.filter(m=>mf(m)&&m.phase==='Intervention');
   const fB=frStats(B),fI=frStats(I),kB=kwhStats(MB),kI=kwhStats(MI);
   const esr=(kB.mean!=null&&kI.mean!=null)?(kB.mean-kI.mean)/kB.mean*100:null;
-  const warn=DATA.met.filter(m=>mf(m)&&/ควรตรวจ/.test(m.note||'')).length;
-  return {fB,fI,kB,kI,esr,warn};
+  return {fB,fI,kB,kI,esr};
 }
 const ALL=summary(null);
 /* ---------- UI state ---------- */
@@ -222,45 +301,45 @@ function verdict(){
   const s=ALL;
   $('#verd').innerHTML=`
   <div class="card ok">
-    <h3>สมมติฐานรอง · Forget Rate</h3>
+    <h3><span class="hyp mono">H2</span>สมมติฐานรอง · Forget Rate</h3>
     <div class="big mono"><span style="color:var(--coral)">${s.fB.fr.toFixed(1)}%</span><span class="arr">→</span><span style="color:var(--mint)">${s.fI.fr.toFixed(1)}%</span></div>
-    <div class="sub">ห้องว่างแต่ยังเปิดไฟหรือแอร์ : Baseline ${s.fB.forget}/${s.fB.empty} ครั้ง · ติดป้าย ${s.fI.forget}/${s.fI.empty} ครั้ง · Fisher p &lt; 0.001</div>
-    <span class="tag ok">✓ เป็นไปตามสมมติฐาน</span>
-    <button class="btn sm" style="margin-left:8px;margin-top:8px" data-how="h2">วิธีคิด ▾</button>
+    <div class="sub">ห้องว่างแต่ยังเปิดไฟหรือแอร์ : Baseline ${s.fB.forget}/${s.fB.empty} ครั้ง · ติดป้าย ${s.fI.forget}/${s.fI.empty} ครั้ง · <span title="คำนวณจาก Python (scipy)">Fisher p &lt; 0.001</span></div>
+    <div class="count-note">Forget Rate นับครั้งที่ตรวจ (ทุกรอบ)</div>
+    <div class="verdict-actions"><span class="tag ok">✓ เป็นไปตามสมมติฐาน</span>
+    <button type="button" class="btn sm" data-how="h2" aria-expanded="false" aria-controls="how-h2">วิธีคิด ▾</button></div>
     <div class="how" id="how-h2"><ol>
       <li>นับครั้งที่ตรวจแล้วพบ <b>ห้องว่าง</b> (ทุกรอบ ทั้ง 12.15 และสุ่ม) : Baseline <span class="mono">${s.fB.empty}</span> · ติดป้าย <span class="mono">${s.fI.empty}</span></li>
       <li>ในนั้น นับครั้งที่ <b>ไฟหรือแอร์ยังเปิด</b> : Baseline <span class="mono">${s.fB.forget}</span> · ติดป้าย <span class="mono">${s.fI.forget}</span></li>
       <li>Forget Rate = ข้อ 2 ÷ ข้อ 1 × 100 : <span class="mono">${s.fB.forget}/${s.fB.empty} = ${s.fB.fr.toFixed(1)}%</span> และ <span class="mono">${s.fI.forget}/${s.fI.empty} = ${s.fI.fr.toFixed(1)}%</span></li>
       <li>ห้องที่ <b>มีคนอยู่</b> ไม่นับ เพราะเปิดไฟตอนใช้งานไม่ใช่การลืม</li>
-    </ol><div class="hlb"><button class="btn sm" data-hl="empty">ไฮไลท์วันที่ห้องว่าง (ตัวหาร)</button><button class="btn sm" data-hl="forget">ไฮไลท์วันที่ลืม (ตัวตั้ง)</button></div></div>
+    </ol><div class="hlb"><button type="button" class="btn sm" data-hl="empty" aria-pressed="false">ไฮไลท์วันที่ห้องว่าง (ตัวหาร)</button>
+      <button type="button" class="btn sm" data-hl="forget" aria-pressed="false">ไฮไลท์วันที่ลืม (ตัวตั้ง)</button></div></div>
   </div>
   <div class="card no">
-    <h3>สมมติฐานหลัก · หน่วยไฟช่วงพักเที่ยง</h3>
-    <div class="big mono">${s.kB.mean.toFixed(3)}<span class="arr">→</span>${s.kI.mean.toFixed(3)} <span style="font-size:.45em;color:var(--muted)">kWh / บ้าน / ชม.</span></div>
-    <div class="sub">ลดลง ${s.esr.toFixed(1)}% แต่ Welch t-test p = 0.153 (ไม่มีนัยสำคัญ) · ${s.warn} จาก 75 แถวมิเตอร์ถูกบันทึกว่าควรตรวจซ้ำ</div>
-    <span class="tag no">✕ ไม่เป็นไปตามสมมติฐาน (ลดลงแต่ไม่มีนัยสำคัญ)</span>
-    <button class="btn sm" style="margin-left:8px;margin-top:8px" data-how="h1">วิธีคิด ▾</button>
+    <h3><span class="hyp mono">H1</span>สมมติฐานหลัก · หน่วยไฟช่วงพักเที่ยง</h3>
+    <div class="big mono">${s.kB.mean.toFixed(3)}<span class="arr">→</span>${s.kI.mean.toFixed(3)} <span class="unit">kWh / บ้าน / ชม.</span></div>
+    <div class="sub">ลดลง ${s.esr.toFixed(1)}% แต่ <span title="คำนวณจาก Python (scipy)">Welch t-test p = 0.153</span> (ไม่มีนัยสำคัญ)</div>
+    <div class="verdict-actions"><span class="tag no">✕ ไม่เป็นไปตามสมมติฐาน (ลดลงแต่ไม่มีนัยสำคัญ)</span>
+    <button type="button" class="btn sm" data-how="h1" aria-expanded="false" aria-controls="how-h1">วิธีคิด ▾</button></div>
     <div class="how" id="how-h1"><ol>
       <li>หน่วยไฟต่อวัน = เลขมิเตอร์ 13.00 − 12.00 (ดูได้ในแต่ละแถว)</li>
       <li>เฉลี่ย Baseline <span class="mono">${s.kB.mean.toFixed(3)}</span> (${s.kB.n} แถว) · เฉลี่ยติดป้าย <span class="mono">${s.kI.mean.toFixed(3)}</span> (${s.kI.n} แถว)</li>
       <li>Energy Saving Rate = (${s.kB.mean.toFixed(3)} − ${s.kI.mean.toFixed(3)}) ÷ ${s.kB.mean.toFixed(3)} × 100 = <span class="mono">${s.esr.toFixed(1)}%</span></li>
       <li>Cost Saving = ${(s.kB.mean-s.kI.mean).toFixed(3)} × ${s.kI.n} × 4.4 บาท = <span class="mono">${((s.kB.mean-s.kI.mean)*s.kI.n*4.4).toFixed(2)} บาท</span> (ตัวเลขนี้ไม่มีนัยสำคัญ ห้ามอ้าง)</li>
-      <li>ทำไมยังอ้างไม่ได้ : ไฟไม่ได้ลดในวันที่ห้องว่าง (จุดที่ป้ายมีผล) และค่าที่ต่ำผิดปกติกระจุกอยู่ที่บ้านที่มิเตอร์อ่านยาก</li>
-    </ol><div class="hlb"><button class="btn sm" data-hl="warn">ไฮไลท์แถวมิเตอร์ที่ควรตรวจซ้ำ</button><button class="btn sm" data-hl="implaus">ไฮไลท์ค่าที่เป็นไปได้ยาก</button></div></div>
+      <li>ทำไมยังอ้างไม่ได้ : ไม่มีนัยสำคัญทางสถิติ และไฟไม่ได้ลดในวันที่ห้องว่างซึ่งเป็นจุดที่ป้ายมีผล</li>
+    </ol></div>
   </div>`;
 }
 /* ---------- tabs ---------- */
 function tabs(){
-  const cnt=o=>{if(!hl)return '';const n=H[o].days.filter(d=>match(d)).length;return `<span class="n ${n?'hot':''}">${n}</span>`};
-  $('#tabs').innerHTML=`<button class="tab ${tab==='all'?'on':''}" data-tab="all">ทุกบ้าน</button>`+
-    OFFICES.map(([o])=>`<button class="tab ${tab===o?'on':''}" data-tab="${o}">${o}${cnt(o)}</button>`).join('');
+  const cnt=o=>{if(!hl)return '';const n=H[o].days.filter(d=>match(d)).length;return `<span title="จำนวนวันที่มีรอบตรวจตรงเงื่อนไข (นับทุกวัน)" class="n ${n?'hot':''}">${n}</span>`};
+  $('#tabs').innerHTML=`<button class="tab ${tab==='all'?'on':''}" data-tab="all" aria-pressed="${tab==='all'}">ทุกบ้าน</button>`+
+    OFFICES.map(([o])=>`<button class="tab ${tab===o?'on':''}" data-tab="${o}" aria-pressed="${tab===o}">${o}${cnt(o)}</button>`).join('');
 }
 function match(d){
   if(!hl)return false;
   if(hl==='empty')return d.r12==='ok'||d.r12==='forget'||d.rr.some(r=>r==='ok'||r==='forget');
   if(hl==='forget')return d.r12==='forget'||d.rr.includes('forget');
-  if(hl==='warn')return d.flags.some(f=>f.t==='w'&&/ตรวจซ้ำ/.test(f.x));
-  if(hl==='implaus')return d.flags.some(f=>f.t==='e');
   return false;
 }
 /* ---------- overview ---------- */
@@ -269,12 +348,13 @@ function overview(){
   <div class="ov">`+OFFICES.map(([o,lab])=>{
     const s=summary(o);
     const fr=x=>x.fr==null?'ไม่มีห้องว่าง':`${x.forget}/${x.empty} = ${x.fr.toFixed(0)}%`;
-    return `<div class="card hc" data-go="${o}"><h4>${o}<small>${lab}</small></h4>
+    return `<article class="card hc"><h4>${o}<small>${lab}</small></h4>
       <div class="strip">${H[o].days.map(d=>`<i class="${d.r12||''} ${d.bl?'bl':''}" title="${fdate(d.date)}"></i>`).join('')}</div>
+      <div class="strip-caption">แถบสี = ผลตรวจ 12.15 น.</div>
       <div class="kv"><span>Forget Rate ก่อน</span><b>${fr(s.fB)}</b><span>Forget Rate หลัง</span><b>${fr(s.fI)}</b>
       <span>kWh เฉลี่ย ก่อน → หลัง</span><b>${s.kB.mean.toFixed(2)} → ${s.kI.mean.toFixed(2)}</b><span>เปลี่ยน</span><b style="color:${s.esr>0?'var(--mint)':'var(--coral)'}">${s.esr>0?'ลด':'เพิ่ม'} ${Math.abs(s.esr).toFixed(0)}%</b>
-      <span>มิเตอร์ควรตรวจซ้ำ</span><b style="color:${s.warn?'var(--coral)':'var(--muted)'}">${s.warn} วัน</b></div>
-      <div style="margin-top:10px"><span class="btn sm">ดูรายวัน →</span></div></div>`}).join('')+`</div>`;
+      </div>
+      <div class="office-cta"><button type="button" class="btn sm" data-go="${o}" aria-label="${o} ดูรายวัน">ดูรายวัน <span aria-hidden="true">→</span></button></div></article>`}).join('')+`</div>`;
 }
 /* ---------- house view ---------- */
 function house(o){
@@ -283,21 +363,22 @@ function house(o){
   const days=H[o].days.filter(d=>{
     if(filter==='forget')return d.r12==='forget'||d.rr.includes('forget');
     if(filter==='empty')return d.r12!=='occ'||d.rr.some(r=>r!=='occ');
-    if(filter==='warn')return d.flags.length>0;
     return true;});
-  let out=`<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;align-items:baseline;margin-bottom:8px"><h2 style="font-size:22px;font-weight:800">${o} <span style="font-size:13px;color:var(--muted);font-weight:600">${lab}</span></h2></div>
+  let out=`<div class="house-heading"><h2>${o} <span style="font-size:13px;color:var(--muted);font-weight:600">${lab}</span></h2></div>
+  <p class="count-note">Forget Rate นับครั้งที่ตรวจ (ทุกรอบ)</p>
   <div class="hsum">
     <div class="stat"><div class="l">Forget Rate · Baseline</div>${fr(s.fB)}</div>
     <div class="stat"><div class="l">Forget Rate · ติดป้าย</div>${fr(s.fI)}</div>
     <div class="stat"><div class="l">kWh เฉลี่ย/ชม. · Baseline</div><div class="v">${s.kB.mean.toFixed(3)}</div><div class="s">${s.kB.n} วัน</div></div>
     <div class="stat"><div class="l">kWh เฉลี่ย/ชม. · ติดป้าย</div><div class="v">${s.kI.mean.toFixed(3)}</div><div class="s">${s.kI.n} วัน</div></div>
     <div class="stat"><div class="l">Energy Saving Rate</div><div class="v ${s.esr>0?'mi':'co'}">${s.esr>0?'−':'+'}${Math.abs(s.esr).toFixed(1)}%</div><div class="s">${s.esr>0?'ใช้ไฟลดลง':'ใช้ไฟเพิ่มขึ้น'}</div></div>
-    <div class="stat"><div class="l">มิเตอร์ควรตรวจซ้ำ</div><div class="v ${s.warn?'co':'mu'}">${s.warn}<span style="font-size:12px"> / 15 วัน</span></div><div class="s">ตามหมายเหตุผู้อ่านค่า</div></div>
   </div>
-  <div class="filters">แสดง : <button class="chip ${filter==='none'?'on':''}" data-f="none">ทุกวัน</button><button class="chip ${filter==='empty'?'on':''}" data-f="empty">เฉพาะวันที่พบห้องว่าง</button><button class="chip ${filter==='forget'?'on':''}" data-f="forget">เฉพาะวันที่ลืม</button><button class="chip ${filter==='warn'?'on':''}" data-f="warn">เฉพาะวันที่มีข้อสังเกต ⚠</button><span style="margin-left:auto;font-size:11.5px">กดแถวเพื่อดูบันทึกดิบและหลักฐาน</span></div>
+  <div class="filters">แสดง : <button class="chip ${filter==='none'?'on':''}" data-f="none" aria-pressed="${filter==='none'}">ทุกวัน</button><button class="chip ${filter==='empty'?'on':''}" data-f="empty" aria-pressed="${filter==='empty'}">เฉพาะวันที่พบห้องว่าง</button><button class="chip ${filter==='forget'?'on':''}" data-f="forget" aria-pressed="${filter==='forget'}">เฉพาะวันที่ลืม</button><span class="filter-hint">กดแถวเพื่อดูบันทึกดิบและหลักฐาน</span></div>
   <div class="days">`;
   let ph=null;
+  // Keep nonmatching days dimmed, and explain when no visible day matches the highlight.
   if(!days.length)out+=`<div class="empty">ไม่มีวันที่ตรงเงื่อนไข</div>`;
+  else if(hl&&!days.some(match))out+=`<p class="notice" role="status">บ้านนี้ไม่มีวันที่ตรงเงื่อนไขไฮไลท์ (${{empty:'ห้องว่าง',forget:'ลืมปิด'}[hl]}) แถวทั้งหมดจึงแสดงแบบจาง</p>`;
   for(const d of days){
     const p=d.bl?'bl':'iv';
     if(p!==ph){ph=p;out+=`<div class="ph ${p}">${d.bl?'Baseline · ยังไม่ติดป้าย':'ติดป้ายแล้ว'}</div>`}
@@ -307,33 +388,33 @@ function house(o){
 }
 const RES={forget:'ลืม · ห้องว่างแต่ยังเปิด',ok:'ปิดครบ',occ:'มีคนอยู่'};
 const chip=(l,v)=>`<span class="c ${v==='เปิด'?'on':(v==='ปิด'?'off':'')}">${l} ${esc(v??'-')}</span>`;
+const evidence=(url,label,cls='')=>url?`<a class="btn sm ${cls}" href="${esc(url)}" target="_blank" rel="noopener">${label}</a>`:`<button type="button" class="btn sm" disabled aria-disabled="true" title="${label}">ไม่มีรูป</button>`;
 function dayRow(o,d){
   const m=d.met,b=d.b12;
   const cls=[hl?(match(d)?'hl':'dim'):''].join(' ');
   const rnd=d.rnd.length?d.rnd.map((r,i)=>{const rr=d.rr[i];return `<span class="res ${rr}" style="font-size:12px">${rr==='occ'?'มีคน':RES[rr]}</span>`}).join(' '):`<span class="res none">ไม่มีสุ่มตรวจ</span>`;
   return `<div class="day ${cls}" data-key="${o}|${d.date}">
-    <div class="row">
-      <div class="d"><b>${fdate(d.date)}</b><span class="pb ${d.bl?'':'iv'}">${d.bl?'BASELINE':'ติดป้าย'}</span></div>
-      <div><span class="lab">ตรวจ 12.15 น.</span><div class="chips">${b?`<span class="c ${b.occ==='ห้องว่าง'?'emp':''}">${esc(b.occ)}</span>${chip('ไฟ',b.light)}${chip('แอร์',b.ac)} <span class="res ${d.r12}">${RES[d.r12]}</span>`:'<span class="res none">ไม่มีบันทึก</span>'}</div></div>
-      <div><span class="lab">สุ่มตรวจ</span><div class="chips">${rnd}</div></div>
-      <div class="kwh"><span class="lab">หน่วยไฟ 12.00–13.00</span>${m?`<b class="${m.kwh<=0.3?'low':''}">${m.kwh.toFixed(2)}</b> <span style="font-size:11px;color:var(--muted)">kWh</span><small>${m.r12} → ${m.r13}${m.temp!=null?` · ${m.temp.toFixed(1)}°C`:''}</small>`:'<span class="res none">ไม่มีค่า</span>'}</div>
-      <div class="flags">${d.flags.map(f=>`<span class="flag ${f.t}">${f.t==='e'?'⛔':'⚠'} ${esc(f.x)}</span>`).join('')||'<span style="color:var(--faint)">ไม่มีข้อสังเกต</span>'}</div>
-    </div>
-    <div class="det">
+    <button type="button" class="row" aria-expanded="false" aria-controls="detail-${o}-${d.date}">
+      <span class="d"><b>${fdate(d.date)}</b><span class="pb ${d.bl?'':'iv'}">${d.bl?'Baseline':'ติดป้าย'}</span></span>
+      <span class="check"><span class="lab">ตรวจ 12.15 น.</span><span class="chips">${b?`<span class="c ${b.occ==='ห้องว่าง'?'emp':''}">${esc(b.occ)}</span>${chip('ไฟ',b.light)}${chip('แอร์',b.ac)} <span class="res ${d.r12}">${RES[d.r12]}</span>`:'<span class="res none">ไม่มีบันทึก</span>'}</span></span>
+      <span><span class="lab">สุ่มตรวจ</span><span class="chips">${rnd}</span></span>
+      <span class="kwh"><span class="lab">หน่วยไฟ 12.00–13.00</span>${m?`<b>${m.kwh.toFixed(2)}</b> <span style="font-size:12px;color:var(--muted)">kWh</span><small>${m.r12} → ${m.r13}${m.temp!=null?` · ${m.temp.toFixed(1)}°C`:''}</small>`:'<span class="res none">ไม่มีค่า</span>'}</span>
+    </button>
+    <div class="det" id="detail-${o}-${d.date}">
       <div><h5>บันทึกพฤติกรรม (Log_พฤติกรรม)</h5>${[b,...d.rnd].filter(Boolean).map(x=>`<table>
         <tr><td>แถวในชีต</td><td class="v"><a href="${sheetLink('beh',x.row)}" target="_blank" rel="noopener">แถว ${x.row} ↗</a> · ${esc(x.round)} ${esc(x.time)}</td></tr>
         <tr><td>สถานะบุคคล</td><td class="v">${esc(x.occ)}</td></tr><tr><td>ไฟ / แอร์</td><td class="v">${esc(x.light)} / ${esc(x.ac)}</td></tr>
-        <tr><td>ผู้บันทึก</td><td class="v">${esc(x.by)}</td></tr>${x.note?`<tr><td>หมายเหตุ</td><td class="v">${esc(x.note)}</td></tr>`:''}
+        <tr><td>ผู้บันทึก</td><td class="v">${esc(x.by)}</td></tr>
       </table>`).join('<div style="height:8px"></div>')||'<div class="note">ไม่มีบันทึกวันนี้</div>'}
-      <div class="links">${b?`<a class="btn sm" href="${sheetLink('beh',b.row)}" target="_blank" rel="noopener">📊 ไปที่แถว ${b.row} ใน Sheet</a>`:''}${b&&b.photo?`<a class="btn sm" href="${esc(b.photo)}" target="_blank" rel="noopener">📁 รูปถ่ายยืนยัน (Drive)</a>`:''}</div></div>
+      <div class="links">${b?`<a class="btn sm" href="${sheetLink('beh',b.row)}" target="_blank" rel="noopener">📊 ไปที่แถว ${b.row} ใน Sheet</a>`:''}${[b,...d.rnd].filter(Boolean).map(x=>evidence(x.photo,'📁 รูปถ่ายยืนยัน (Drive)')).join('')}</div></div>
       <div><h5>บันทึกมิเตอร์ (Log_มิเตอร์ไฟฟ้า)</h5>${m?`<table>
         <tr><td>แถวในชีต</td><td class="v"><a href="${sheetLink('met',m.row)}" target="_blank" rel="noopener">แถว ${m.row} ↗</a></td></tr>
         <tr><td>เลขมิเตอร์ 12.00</td><td class="v mono">${m.r12}</td></tr><tr><td>เลขมิเตอร์ 13.00</td><td class="v mono">${m.r13}</td></tr>
         <tr><td>หน่วยที่ใช้</td><td class="v mono">${m.r13} − ${m.r12} = ${m.kwh.toFixed(2)} kWh</td></tr>
         <tr><td>อุณหภูมิภายนอก</td><td class="v">${m.temp!=null?m.temp.toFixed(2)+' °C':'ไม่มีค่า'}</td></tr>
         <tr><td>ผู้บันทึก</td><td class="v">${esc(m.by)}</td></tr>
-        <tr><td>หมายเหตุ</td><td class="v note">${esc(m.note||'-')}</td></tr></table>
-        <div class="links"><a class="btn sm mi" href="${esc(m.link12||'#')}" target="_blank" rel="noopener">📷 รูปมิเตอร์ 12.00</a><a class="btn sm mi" href="${esc(m.link13||'#')}" target="_blank" rel="noopener">📷 รูปมิเตอร์ 13.00</a><a class="btn sm" href="${sheetLink('met',m.row)}" target="_blank" rel="noopener">📊 ไปที่แถว ${m.row} ใน Sheet</a></div>`:'<div class="note">ไม่มีค่ามิเตอร์วันนี้</div>'}</div>
+        </table>
+        <div class="links">${evidence(m.link12,'📷 รูปมิเตอร์ 12.00','mi')}${evidence(m.link13,'📷 รูปมิเตอร์ 13.00','mi')}<a class="btn sm" href="${sheetLink('met',m.row)}" target="_blank" rel="noopener">📊 ไปที่แถว ${m.row} ใน Sheet</a></div>`:'<div class="note">ไม่มีค่ามิเตอร์วันนี้</div>'}</div>
     </div>
   </div>`;
 }
@@ -342,20 +423,25 @@ function render(){
   tabs();
   $('#view').innerHTML=tab==='all'?overview():house(tab);
   $('#toast').classList.toggle('on',!!hl);
+  document.querySelectorAll('[data-hl]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.hl===hl)));
   if(hl){const n=Object.values(H).reduce((a,h)=>a+h.days.filter(match).length,0);
-    $('#toastTx').textContent={empty:'ไฮไลท์วันที่พบห้องว่าง',forget:'ไฮไลท์วันที่ลืมปิด',warn:'ไฮไลท์แถวมิเตอร์ที่ควรตรวจซ้ำ',implaus:'ไฮไลท์ค่ามิเตอร์ที่เป็นไปได้ยาก'}[hl]+` · ${n} วัน · เลขบนแท็บ = จำนวนต่อบ้าน`}
+    $('#toastTx').textContent={empty:'ไฮไลท์วันที่พบห้องว่าง',forget:'ไฮไลท์วันที่ลืมปิด'}[hl]+` · ${n} วัน (นับทุกวัน) · เลขบนแท็บ = จำนวนวันต่อบ้านที่มีรอบใดรอบหนึ่งตรงเงื่อนไข`}
   location.hash=tab==='all'?'':tab;
 }
 document.addEventListener('click',e=>{
   const t=e.target.closest('[data-tab],[data-go],[data-f],[data-hl],[data-how],.row,#toastX');
   if(!t)return;
-  if(t.dataset.tab){tab=t.dataset.tab;filter='none';render();window.scrollTo({top:$('#tabs').offsetTop-4,behavior:'smooth'});return}
-  if(t.dataset.go){tab=t.dataset.go;filter='none';render();window.scrollTo({top:$('#tabs').offsetTop-4,behavior:'smooth'});return}
-  if(t.dataset.f){filter=t.dataset.f;render();return}
+  if(t.dataset.tab){tab=t.dataset.tab;filter='none';render();$('#tabs [data-tab="'+tab+'"]').focus();window.scrollTo({top:$('#tabs').offsetTop-4,behavior:window.matchMedia?.('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});return}
+  if(t.dataset.go){tab=t.dataset.go;filter='none';render();$('#tabs [data-tab="'+tab+'"]').focus();window.scrollTo({top:$('#tabs').offsetTop-4,behavior:window.matchMedia?.('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});return}
+  if(t.dataset.f){filter=t.dataset.f;render();$('#view [data-f="'+filter+'"]').focus();return}
   if(t.dataset.hl){hl=hl===t.dataset.hl?null:t.dataset.hl;if(hl&&tab==='all'){tab=OFFICES[0][0]}render();return}
-  if(t.dataset.how){const el=document.getElementById('how-'+t.dataset.how);el.classList.toggle('on');t.textContent=el.classList.contains('on')?'วิธีคิด ▴':'วิธีคิด ▾';return}
-  if(t.id==='toastX'){hl=null;render();return}
-  if(t.classList.contains('row')){t.parentElement.classList.toggle('open')}
+  if(t.dataset.how){const el=document.getElementById('how-'+t.dataset.how);el.classList.toggle('on');t.setAttribute('aria-expanded',String(el.classList.contains('on')));t.textContent=el.classList.contains('on')?'วิธีคิด ▴':'วิธีคิด ▾';return}
+  if(t.id==='toastX'){hl=null;render();$('#tabs [data-tab="'+tab+'"]')?.focus();return}
+  if(t.classList.contains('row')){t.parentElement.classList.toggle('open');t.setAttribute('aria-expanded',String(t.parentElement.classList.contains('open')))}
+});
+window.addEventListener?.('hashchange',()=>{
+  const h=location.hash.slice(1);const next=OFFICES.some(x=>x[0]===h)?h:'all';
+  if(next!==tab){tab=next;filter='none';render()}
 });
 const h=location.hash.slice(1); if(OFFICES.some(x=>x[0]===h))tab=h;
 verdict(); render();
