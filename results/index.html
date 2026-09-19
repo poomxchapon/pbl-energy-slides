@@ -247,7 +247,7 @@ header{gap:16px;padding-bottom:24px;margin-bottom:24px}
 
 <div class="foot">
   <span>ข้อมูลจาก แบบเก็บข้อมูลสำหรับสำรวจ (Google Sheet ของทีม) · เลขแถวคือเลขแถวจริงในชีต</span>
-  <span class="mono" id="ver">RESULTS v1.1.1</span>
+  <span class="mono" id="ver">RESULTS v1.1.2</span>
 </div>
 </div>
 <div class="toast" id="toast"><span id="toastTx" role="status" aria-live="polite"></span><button id="toastX">ยกเลิกไฮไลท์ ✕</button></div>
@@ -303,6 +303,21 @@ document.getElementById('lnkDrive').href=(DATA.beh.find(b=>b.photo)||{}).photo||
 function verdict(){
   const s=ALL;
   $('#verd').innerHTML=`
+  <div class="card part">
+    <h3><span class="hyp mono">H1</span>สมมติฐานหลัก · หน่วยไฟช่วงพักเที่ยง</h3>
+    <div class="hst">การติดตั้งป้ายเตือนก่อนออกจากพื้นที่จะลดปริมาณการใช้พลังงานไฟฟ้าเฉลี่ยในช่วงพักกลางวัน เมื่อเทียบกับช่วงไม่มีป้าย</div>
+    <div class="big mono">${s.kB.mean.toFixed(3)}<span class="arr">→</span>${s.kI.mean.toFixed(3)} <span class="unit">kWh / บ้าน / ชม.</span></div>
+    <div class="sub">ค่าเฉลี่ยลดลง ${s.esr.toFixed(1)}% ตามทิศทางที่ตั้งไว้ · <span title="คำนวณจาก Python (scipy)">Welch t-test p = 0.153</span> ยังไม่ถึงระดับนัยสำคัญทางสถิติ</div>
+    <div class="verdict-actions"><span class="tag part">✓ เป็นไปตามสมมติฐาน · ยังไม่มีนัยสำคัญทางสถิติ</span>
+    <button type="button" class="btn sm" data-how="h1" aria-expanded="false" aria-controls="how-h1">วิธีคิด ▾</button></div>
+    <div class="how" id="how-h1"><ol>
+      <li>หน่วยไฟต่อวัน = เลขมิเตอร์ 13.00 − 12.00 (ดูได้ในแต่ละแถว)</li>
+      <li>เฉลี่ย Baseline <span class="mono">${s.kB.mean.toFixed(3)}</span> (${s.kB.n} แถว) · เฉลี่ยติดป้าย <span class="mono">${s.kI.mean.toFixed(3)}</span> (${s.kI.n} แถว)</li>
+      <li>Energy Saving Rate = (${s.kB.mean.toFixed(3)} − ${s.kI.mean.toFixed(3)}) ÷ ${s.kB.mean.toFixed(3)} × 100 = <span class="mono">${s.esr.toFixed(1)}%</span></li>
+      <li>Cost Saving = ${(s.kB.mean-s.kI.mean).toFixed(3)} × ${s.kI.n} × 4.4 บาท = <span class="mono">${((s.kB.mean-s.kI.mean)*s.kI.n*4.4).toFixed(2)} บาท</span> (รายงานเป็นค่าประมาณ และระบุเสมอว่ายังไม่มีนัยสำคัญ)</li>
+      <li>ข้อควรระวังตอนนำเสนอ : ค่าเฉลี่ยลดลงตามสมมติฐาน แต่ p = 0.153 จึงยังยืนยันทางสถิติไม่ได้ และไฟไม่ได้ลดในวันที่ห้องว่างซึ่งเป็นจุดที่ป้ายมีผล</li>
+    </ol></div>
+  </div>
   <div class="card ok">
     <h3><span class="hyp mono">H2</span>สมมติฐานรอง · Forget Rate</h3>
     <div class="hst">อัตราการลืม (Forget Rate) ในช่วงติดตั้งป้าย จะต่ำกว่าช่วง Baseline</div>
@@ -318,21 +333,6 @@ function verdict(){
       <li>ห้องที่ <b>มีคนอยู่</b> ไม่นับ เพราะเปิดไฟตอนใช้งานไม่ใช่การลืม</li>
     </ol><div class="hlb"><button type="button" class="btn sm" data-hl="empty" aria-pressed="false">ไฮไลท์วันที่ห้องว่าง (ตัวหาร)</button>
       <button type="button" class="btn sm" data-hl="forget" aria-pressed="false">ไฮไลท์วันที่ลืม (ตัวตั้ง)</button></div></div>
-  </div>
-  <div class="card part">
-    <h3><span class="hyp mono">H1</span>สมมติฐานหลัก · หน่วยไฟช่วงพักเที่ยง</h3>
-    <div class="hst">การติดตั้งป้ายเตือนก่อนออกจากพื้นที่จะลดปริมาณการใช้พลังงานไฟฟ้าเฉลี่ยในช่วงพักกลางวัน เมื่อเทียบกับช่วงไม่มีป้าย</div>
-    <div class="big mono">${s.kB.mean.toFixed(3)}<span class="arr">→</span>${s.kI.mean.toFixed(3)} <span class="unit">kWh / บ้าน / ชม.</span></div>
-    <div class="sub">ค่าเฉลี่ยลดลง ${s.esr.toFixed(1)}% ตามทิศทางที่ตั้งไว้ · <span title="คำนวณจาก Python (scipy)">Welch t-test p = 0.153</span> ยังไม่ถึงระดับนัยสำคัญทางสถิติ</div>
-    <div class="verdict-actions"><span class="tag part">✓ เป็นไปตามสมมติฐาน · ยังไม่มีนัยสำคัญทางสถิติ</span>
-    <button type="button" class="btn sm" data-how="h1" aria-expanded="false" aria-controls="how-h1">วิธีคิด ▾</button></div>
-    <div class="how" id="how-h1"><ol>
-      <li>หน่วยไฟต่อวัน = เลขมิเตอร์ 13.00 − 12.00 (ดูได้ในแต่ละแถว)</li>
-      <li>เฉลี่ย Baseline <span class="mono">${s.kB.mean.toFixed(3)}</span> (${s.kB.n} แถว) · เฉลี่ยติดป้าย <span class="mono">${s.kI.mean.toFixed(3)}</span> (${s.kI.n} แถว)</li>
-      <li>Energy Saving Rate = (${s.kB.mean.toFixed(3)} − ${s.kI.mean.toFixed(3)}) ÷ ${s.kB.mean.toFixed(3)} × 100 = <span class="mono">${s.esr.toFixed(1)}%</span></li>
-      <li>Cost Saving = ${(s.kB.mean-s.kI.mean).toFixed(3)} × ${s.kI.n} × 4.4 บาท = <span class="mono">${((s.kB.mean-s.kI.mean)*s.kI.n*4.4).toFixed(2)} บาท</span> (รายงานเป็นค่าประมาณ และระบุเสมอว่ายังไม่มีนัยสำคัญ)</li>
-      <li>ข้อควรระวังตอนนำเสนอ : ค่าเฉลี่ยลดลงตามสมมติฐาน แต่ p = 0.153 จึงยังยืนยันทางสถิติไม่ได้ และไฟไม่ได้ลดในวันที่ห้องว่างซึ่งเป็นจุดที่ป้ายมีผล</li>
-    </ol></div>
   </div>`;
 }
 /* ---------- tabs ---------- */
