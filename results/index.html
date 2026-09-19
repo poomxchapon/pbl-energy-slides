@@ -269,7 +269,7 @@ header{gap:16px;padding-bottom:24px;margin-bottom:24px}
 
 <div class="foot">
   <span>ข้อมูลจาก แบบเก็บข้อมูลสำหรับสำรวจ (Google Sheet ของทีม) · เลขแถวคือเลขแถวจริงในชีต</span>
-  <span class="mono" id="ver">RESULTS v1.2.0</span>
+  <span class="mono" id="ver">RESULTS v1.2.1</span>
 </div>
 </div>
 <div class="toast" id="toast"><span id="toastTx" role="status" aria-live="polite"></span><button id="toastX">ยกเลิกไฮไลท์ ✕</button></div>
@@ -336,7 +336,7 @@ function verdict(){
       <li>หน่วยไฟต่อวัน = เลขมิเตอร์ 13.00 − 12.00 (ดูได้ในแต่ละแถว)</li>
       <li>เฉลี่ย Baseline <span class="mono">${s.kB.mean.toFixed(3)}</span> (${s.kB.n} แถว) · เฉลี่ยติดป้าย <span class="mono">${s.kI.mean.toFixed(3)}</span> (${s.kI.n} แถว)</li>
       <li>Energy Saving Rate = (${s.kB.mean.toFixed(3)} − ${s.kI.mean.toFixed(3)}) ÷ ${s.kB.mean.toFixed(3)} × 100 = <span class="mono">${s.esr.toFixed(1)}%</span></li>
-      <li>Cost Saving = ${(s.kB.mean-s.kI.mean).toFixed(3)} × ${s.kI.n} × 4.4 บาท = <span class="mono">${((s.kB.mean-s.kI.mean)*s.kI.n*4.4).toFixed(2)} บาท</span> (รายงานเป็นค่าประมาณ และระบุเสมอว่ายังไม่มีนัยสำคัญ)</li>
+      <li>Cost Saving = ${(s.kB.mean-s.kI.mean).toFixed(3)} × ${s.kI.n} × 8 บาท = <span class="mono">${((s.kB.mean-s.kI.mean)*s.kI.n*8).toFixed(2)} บาท</span> (รายงานเป็นค่าประมาณ และระบุเสมอว่ายังไม่มีนัยสำคัญ)</li>
       <li>ข้อควรระวังตอนนำเสนอ : ค่าเฉลี่ยลดลงตามสมมติฐาน แต่ p = 0.153 จึงยังยืนยันทางสถิติไม่ได้ และไฟไม่ได้ลดในวันที่ห้องว่างซึ่งเป็นจุดที่ป้ายมีผล</li>
     </ol></div>
   </div>
@@ -415,7 +415,7 @@ function house(o){
 }
 /* ---------- per-house totals (shown under the day list; always covers all 15 days) ---------- */
 function houseSummary(o,s){
-  const RATE=4.4;
+  const RATE=8;
   const ph=bl=>{
     const ds=H[o].days.filter(d=>d.bl===bl&&d.met);const v=ds.map(d=>d.met.kwh);
     const t=ds.map(d=>d.met.temp).filter(x=>x!=null);
