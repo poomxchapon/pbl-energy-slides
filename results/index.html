@@ -159,6 +159,27 @@ header .sub{max-width:88ch}
 .det td.v{color:var(--fg)}
 .det .links{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
 .note{font-size:12px;line-height:1.7;word-break:break-word;color:var(--readable)}
+.hsx{margin-top:48px;padding-top:32px;border-top:1px solid var(--line2)}
+.hsx h3{font-size:20px;font-weight:800;line-height:1.6}
+.hsx-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:16px;align-items:start}
+.hsx .card h4{font-size:14px;font-weight:700;color:var(--amber);margin-bottom:16px;line-height:1.7}
+.tw{overflow-x:auto}
+.calc{width:100%;border-collapse:collapse;font-size:13px}
+.calc th,.calc td{padding:8px;border-bottom:1px solid var(--line2);text-align:left;vertical-align:top;line-height:1.7}
+.calc thead th{font-size:12px;color:var(--muted);font-weight:600}
+.calc tbody th{font-weight:500;color:var(--readable);width:38%}
+.calc td{color:var(--fg)}
+.calc td.sm{font-size:12px;color:var(--readable);overflow-wrap:anywhere}
+.calc tr.em th,.calc tr.em td{background:rgba(255,176,32,.05);color:var(--fg)}
+.calc td b{color:var(--amber)}
+.calc .mi,.steps .mi{color:var(--mint)}
+.calc .co,.steps .co{color:var(--coral)}
+.steps{margin:16px 0 0;padding-left:24px;display:grid;gap:8px;font-size:13px;color:var(--readable)}
+.steps li::marker{color:var(--amber);font-family:"JetBrains Mono",monospace}
+.steps b{color:var(--fg)}
+.steps b.mi{color:var(--mint)}
+.steps b.co{color:var(--coral)}
+.muted{color:var(--muted);font-size:12px}
 .notice{margin:0 0 8px;padding:12px 16px;border-radius:12px;background:rgba(255,176,32,.08);border:1px solid var(--line);color:var(--readable);font-size:13px}
 .empty{padding:32px;text-align:center;color:var(--readable);border:1px dashed var(--line2);border-radius:var(--r)}
 .foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;margin-top:48px;padding-top:24px;border-top:1px solid var(--line2);font-size:12px;color:var(--muted)}
@@ -179,6 +200,7 @@ header .sub{max-width:88ch}
 
 
 @media(max-width:900px){.verd{grid-template-columns:1fr;gap:16px}
+.hsx-grid{grid-template-columns:1fr;gap:16px}
 .verd .card{padding:24px}
 .card .big{font-size:40px}
 .row{grid-template-columns:1fr 1fr;gap:24px 16px;padding:24px}
@@ -247,7 +269,7 @@ header{gap:16px;padding-bottom:24px;margin-bottom:24px}
 
 <div class="foot">
   <span>ข้อมูลจาก แบบเก็บข้อมูลสำหรับสำรวจ (Google Sheet ของทีม) · เลขแถวคือเลขแถวจริงในชีต</span>
-  <span class="mono" id="ver">RESULTS v1.1.2</span>
+  <span class="mono" id="ver">RESULTS v1.2.0</span>
 </div>
 </div>
 <div class="toast" id="toast"><span id="toastTx" role="status" aria-live="polite"></span><button id="toastX">ยกเลิกไฮไลท์ ✕</button></div>
@@ -389,7 +411,61 @@ function house(o){
     if(p!==ph){ph=p;out+=`<div class="ph ${p}">${d.bl?'Baseline · ยังไม่ติดป้าย':'ติดป้ายแล้ว'}</div>`}
     out+=dayRow(o,d);
   }
-  return out+`</div>`;
+  return out+`</div>`+houseSummary(o,s);
+}
+/* ---------- per-house totals (shown under the day list; always covers all 15 days) ---------- */
+function houseSummary(o,s){
+  const RATE=4.4;
+  const ph=bl=>{
+    const ds=H[o].days.filter(d=>d.bl===bl&&d.met);const v=ds.map(d=>d.met.kwh);
+    const t=ds.map(d=>d.met.temp).filter(x=>x!=null);
+    const beh=DATA.beh.filter(b=>b.office===o&&(b.phase==='Baseline')===bl);
+    const n12=beh.filter(b=>b.round.includes('12.15')).length,emp=beh.filter(b=>b.occ==='ห้องว่าง');
+    const fg=emp.filter(b=>res12(b)==='forget').length;
+    return {v,sum:v.reduce((a,b)=>a+b,0),n:v.length,min:Math.min(...v),max:Math.max(...v),
+      temp:t.length?t.reduce((a,b)=>a+b,0)/t.length:null,
+      nb:beh.length,n12,nr:beh.length-n12,occ:beh.length-emp.length,emp:emp.length,fg,ok:emp.length-fg};
+  };
+  const B=ph(true),I=ph(false),mB=B.sum/B.n,mI=I.sum/I.n,diff=mB-mI,esr=diff/mB*100,cost=diff*I.n*RATE;
+  const list=x=>x.v.map(k=>k.toFixed(2)).join(' + ');
+  const fr=x=>x.emp?`${x.fg} ÷ ${x.emp} × 100 = <b>${(x.fg/x.emp*100).toFixed(1)}%</b>`:'<b>คำนวณไม่ได้</b> (ไม่พบห้องว่าง)';
+  return `<section class="hsx" aria-labelledby="hsx-${o}">
+  <h3 id="hsx-${o}">สรุปรวมของ ${o}</h3>
+  <p class="count-note">รวมจากทั้ง 15 วันของบ้านนี้ (ไม่ขึ้นกับตัวกรองด้านบน) · ตัวเลขทุกตัวมาจากแถวรายวันข้างบน</p>
+  <div class="hsx-grid">
+    <div class="card"><h4>พลังงาน · หน่วยไฟช่วง 12.00–13.00</h4>
+      <div class="tw"><table class="calc">
+        <thead><tr><th scope="col"></th><th scope="col">Baseline</th><th scope="col">ติดป้าย</th></tr></thead>
+        <tbody>
+        <tr><th scope="row">จำนวนวันที่มีค่ามิเตอร์</th><td class="mono">${B.n} วัน</td><td class="mono">${I.n} วัน</td></tr>
+        <tr><th scope="row">หน่วยไฟรายวัน (kWh)</th><td class="mono sm">${list(B)}</td><td class="mono sm">${list(I)}</td></tr>
+        <tr class="em"><th scope="row">รวมหน่วยไฟ</th><td class="mono">${B.sum.toFixed(2)} kWh</td><td class="mono">${I.sum.toFixed(2)} kWh</td></tr>
+        <tr class="em"><th scope="row">เฉลี่ยต่อวัน (รวม ÷ จำนวนวัน)</th><td class="mono">${B.sum.toFixed(2)} ÷ ${B.n} = <b>${mB.toFixed(3)}</b></td><td class="mono">${I.sum.toFixed(2)} ÷ ${I.n} = <b>${mI.toFixed(3)}</b></td></tr>
+        <tr><th scope="row">ต่ำสุด ถึง สูงสุด</th><td class="mono">${B.min.toFixed(2)} ถึง ${B.max.toFixed(2)}</td><td class="mono">${I.min.toFixed(2)} ถึง ${I.max.toFixed(2)}</td></tr>
+        <tr><th scope="row">อุณหภูมิภายนอกเฉลี่ย</th><td class="mono">${B.temp!=null?B.temp.toFixed(1)+' °C':'-'}</td><td class="mono">${I.temp!=null?I.temp.toFixed(1)+' °C':'-'}</td></tr>
+        </tbody></table></div>
+      <ol class="steps">
+        <li>ผลต่างค่าเฉลี่ย = ${mB.toFixed(3)} − ${mI.toFixed(3)} = <b class="mono">${diff>=0?'':'−'}${Math.abs(diff).toFixed(3)} kWh ต่อวัน</b></li>
+        <li>Energy Saving Rate = ${Math.abs(diff).toFixed(3)} ÷ ${mB.toFixed(3)} × 100 = <b class="mono ${esr>0?'mi':'co'}">${esr>0?'ลดลง':'เพิ่มขึ้น'} ${Math.abs(esr).toFixed(1)}%</b></li>
+        <li>คิดเป็นเงิน = ${Math.abs(diff).toFixed(3)} × ${I.n} วัน × ${RATE} บาท = <b class="mono">${cost>=0?'ประหยัด':'จ่ายเพิ่ม'} ${Math.abs(cost).toFixed(2)} บาท</b> <span class="muted">(เฉพาะชั่วโมงพักเที่ยง ${I.n} วัน เป็นค่าประมาณ)</span></li>
+      </ol></div>
+    <div class="card"><h4>พฤติกรรม · การตรวจห้อง</h4>
+      <div class="tw"><table class="calc">
+        <thead><tr><th scope="col"></th><th scope="col">Baseline</th><th scope="col">ติดป้าย</th></tr></thead>
+        <tbody>
+        <tr><th scope="row">เข้าตรวจทั้งหมด</th><td class="mono">${B.nb} ครั้ง</td><td class="mono">${I.nb} ครั้ง</td></tr>
+        <tr><th scope="row">แบ่งเป็น รอบ 12.15 / สุ่มตรวจ</th><td class="mono">${B.n12} / ${B.nr}</td><td class="mono">${I.n12} / ${I.nr}</td></tr>
+        <tr><th scope="row">พบมีคนอยู่ (ไม่นับ)</th><td class="mono">${B.occ} ครั้ง</td><td class="mono">${I.occ} ครั้ง</td></tr>
+        <tr class="em"><th scope="row">พบห้องว่าง (ตัวหาร)</th><td class="mono">${B.emp} ครั้ง</td><td class="mono">${I.emp} ครั้ง</td></tr>
+        <tr><th scope="row">ห้องว่างและปิดครบ</th><td class="mono mi">${B.ok} ครั้ง</td><td class="mono mi">${I.ok} ครั้ง</td></tr>
+        <tr class="em"><th scope="row">ห้องว่างแต่ไฟหรือแอร์ยังเปิด (ตัวตั้ง)</th><td class="mono co">${B.fg} ครั้ง</td><td class="mono co">${I.fg} ครั้ง</td></tr>
+        </tbody></table></div>
+      <ol class="steps">
+        <li>Forget Rate · Baseline = ${fr(B)}</li>
+        <li>Forget Rate · ติดป้าย = ${fr(I)}</li>
+        <li>${B.emp&&I.emp?`เปลี่ยนแปลง = ${(I.fg/I.emp*100).toFixed(1)} − ${(B.fg/B.emp*100).toFixed(1)} = <b class="mono">${((I.fg/I.emp-B.fg/B.emp)*100).toFixed(1)} จุดร้อยละ</b>`:'บ้านนี้เทียบก่อนหลังไม่ได้ เพราะมีช่วงหนึ่งที่ไม่พบห้องว่างเลย'}</li>
+      </ol></div>
+  </div></section>`;
 }
 const RES={forget:'ลืม · ห้องว่างแต่ยังเปิด',ok:'ปิดครบ',occ:'มีคนอยู่'};
 const chip=(l,v)=>`<span class="c ${v==='เปิด'?'on':(v==='ปิด'?'off':'')}">${l} ${esc(v??'-')}</span>`;
